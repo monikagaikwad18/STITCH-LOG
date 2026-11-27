@@ -1,0 +1,3494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stitch Log — Bespoke Atelier Ledger</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Cormorant Garamond, Playfair Display, Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ivory: '#FBF8F3',
+            parchment: '#F3EEE5',
+            forest: '#182C25',
+            forestLight: '#244036',
+            espresso: '#2A221D',
+            taupe: '#6D6057',
+            gold: '#B69252',
+            goldLight: '#DFC58E',
+            roseDust: '#D47A96',
+            roseDeep: '#B25A76',
+            roseBlush: '#F7E3EA',
+            roseTint: '#FDF5F8'
+          },
+          fontFamily: {
+            serif: ['Cormorant Garamond', 'Playfair Display', 'Georgia', 'serif'],
+            display: ['Playfair Display', 'Cormorant Garamond', 'Georgia', 'serif'],
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          boxShadow: {
+            editorial: '0 8px 30px -8px rgba(24, 44, 37, 0.12)',
+            card: '0 3px 16px -3px rgba(24, 44, 37, 0.08)',
+            roseGlow: '0 6px 22px -4px rgba(212, 122, 150, 0.36)'
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background-color: #FBF8F3;
+      color: #2A221D;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-image:
+        radial-gradient(rgba(182, 146, 82, 0.12) 1px, transparent 0),
+        radial-gradient(rgba(212, 122, 150, 0.12) 1px, #FBF8F3 0);
+      background-size: 32px 32px;
+      background-position: 0 0, 16px 16px;
+    }
+    .font-editorial {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    }
+    .font-script {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+      font-style: italic;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FBF8F3;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D47A96;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #B69252;
+    }
+    .border-heirloom {
+      border: 1.5px solid rgba(182, 146, 82, 0.5);
+    }
+    .border-rose-hairline {
+      border: 1.5px solid rgba(212, 122, 150, 0.7);
+    }
+    .btn-tactile {
+      transition: transform 0.12s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+    .btn-tactile:active {
+      transform: scale(0.97);
+    }
+    @media print {
+      header, nav, #toast-container, .no-print {
+        display: none !important;
+      }
+      body {
+        background: #ffffff !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-roseBlush selection:text-forest">
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[70] flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- =========================================================
+       AUTHENTICATION & ACCOUNT CREATION SCREEN
+       ========================================================= -->
+  <section id="auth-screen" class="min-h-screen w-full flex flex-row overflow-x-hidden">
+    <!-- Left 50% Half: Forest/Hunter Green Pattern & Cursive Stitch Log -->
+    <div class="w-1/2 min-h-screen bg-forest text-ivory p-4 sm:p-8 lg:p-12 flex items-center justify-center text-center relative overflow-hidden shrink-0" style="background-image: radial-gradient(rgba(182, 146, 82, 0.16) 1px, transparent 1px), radial-gradient(rgba(212, 122, 150, 0.14) 1px, #182C25 1px); background-size: 28px 28px; background-position: 0 0, 14px 14px;">
+      <h1 class="font-script text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold tracking-tight text-ivory leading-none select-none break-words">
+        Stitch Log
+      </h1>
+    </div>
+
+    <!-- Right 50% Half: Login / Create Account Form Panel -->
+    <div class="w-1/2 min-h-screen p-4 sm:p-8 lg:p-12 flex flex-col justify-center bg-ivory/90 overflow-y-auto shrink-0">
+      <div class="max-w-xl w-full mx-auto">
+        <div class="flex items-center justify-between gap-2 mb-6 flex-wrap">
+          <!-- Mode Switcher -->
+          <div class="flex items-center gap-1.5 bg-parchment p-1 rounded-full border border-gold/45">
+            <button type="button" onclick="setAuthMode('login')" id="tab-auth-login" class="px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold bg-forest text-ivory transition-all">
+              <span data-i18n="login">Atelier Login</span>
+            </button>
+            <button type="button" onclick="setAuthMode('signup')" id="tab-auth-signup" class="px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold text-taupe hover:text-forest transition-all">
+              <span data-i18n="createAccount">Create Account</span>
+            </button>
+          </div>
+
+          <!-- Language Selector -->
+          <div class="flex items-center gap-1.5 bg-white border border-gold/50 rounded-full px-3 py-1.5">
+            <i class="ph ph-translate text-roseDeep text-sm"></i>
+            <select id="auth-lang-select" onchange="changeLanguage(this.value)" aria-label="Select Language" class="bg-transparent text-xs font-semibold text-forest focus:outline-none cursor-pointer"></select>
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+          <div>
+            <h2 class="font-editorial text-2xl sm:text-4xl font-bold text-forest" data-i18n="welcomeBack">Welcome Back, Master Tailor</h2>
+            <p class="text-xs text-taupe mt-1" data-i18n="loginDesc">Sign in to access your Stitch Log measurements, orders, and client fittings.</p>
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1" data-i18n="tailorEmailLabel">Tailor Email or Name</label>
+            <input id="login-identifier" type="text" required value="aarav@atelier.in" class="w-full bg-white border-2 border-gold/45 rounded-xl px-4 py-2.5 text-sm text-espresso focus:outline-none focus:border-roseDeep" />
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1" data-i18n="passcodeLabel">Passcode / Password</label>
+            <input id="login-password" type="password" required value="couture1890" class="w-full bg-white border-2 border-gold/45 rounded-xl px-4 py-2.5 text-sm text-espresso focus:outline-none focus:border-roseDeep" />
+          </div>
+          <div class="pt-2 flex flex-col sm:flex-row gap-3">
+            <button type="submit" class="btn-tactile flex-1 py-3 px-6 rounded-full bg-forest hover:bg-forestLight text-ivory text-sm font-bold border border-gold shadow-sm flex items-center justify-center gap-2">
+              <i class="ph-fill ph-key text-roseDust"></i>
+              <span data-i18n="enterAtelier">Enter Stitch Log</span>
+            </button>
+            <button type="button" onclick="useDemoTailorLogin()" class="btn-tactile py-3 px-5 rounded-full bg-roseBlush hover:bg-roseDust/60 text-forest text-xs font-bold border border-roseDust flex items-center justify-center gap-1.5">
+              <i class="ph-fill ph-sparkle text-roseDeep"></i>
+              <span data-i18n="demoAccount">Demo Account</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Account Creation Form -->
+        <form id="signup-form" onsubmit="handleSignupSubmit(event)" class="space-y-3.5 hidden">
+          <div>
+            <h2 class="font-editorial text-2xl sm:text-3xl font-bold text-forest" data-i18n="createAccountTitle">Create Tailor Account</h2>
+            <p class="text-xs text-taupe mt-1" data-i18n="createAccountDesc">Set up your Stitch Log shop identity and master tailor login.</p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1" data-i18n="shopNameLabel">Shop Name *</label>
+              <input id="signup-boutique" type="text" required placeholder="e.g., Stitch Log" class="w-full bg-white border-2 border-gold/45 rounded-xl px-3.5 py-2.5 text-sm text-espresso focus:outline-none focus:border-roseDeep" />
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1" data-i18n="tailorNameLabel">Tailor Name *</label>
+              <input id="signup-tailor" type="text" required placeholder="e.g., Aarav Kulkarni" class="w-full bg-white border-2 border-gold/45 rounded-xl px-3.5 py-2.5 text-sm text-espresso focus:outline-none focus:border-roseDeep" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1" data-i18n="emailIdLabel">Email / Login ID *</label>
+              <input id="signup-email" type="text" required placeholder="tailor@stitchlog.in" class="w-full bg-white border-2 border-gold/45 rounded-xl px-3.5 py-2.5 text-sm text-espresso focus:outline-none focus:border-roseDeep" />
+            </div>
+            <div>
+              <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1" data-i18n="passwordLabel">Password *</label>
+              <input id="signup-password" type="password" required minlength="4" placeholder="Create passcode" class="w-full bg-white border-2 border-gold/45 rounded-xl px-3.5 py-2.5 text-sm text-espresso focus:outline-none focus:border-roseDeep" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1" data-i18n="preferredLangLabel">Preferred Language</label>
+            <select id="signup-lang" class="w-full bg-white border-2 border-gold/45 rounded-xl px-3.5 py-2.5 text-sm text-espresso focus:outline-none focus:border-roseDeep"></select>
+          </div>
+          <button type="submit" class="btn-tactile w-full py-3 px-6 rounded-full bg-forest hover:bg-forestLight text-ivory text-sm font-bold border border-gold shadow-sm flex items-center justify-center gap-2 mt-2">
+            <i class="ph-fill ph-seal-check text-roseDust"></i>
+            <span data-i18n="saveAccountBtn">Save Account &amp; Open Stitch Log</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       MAIN STITCH LOG APPLICATION SHELL
+       ========================================================= -->
+  <div id="app-shell" class="hidden min-h-screen flex flex-col">
+    <!-- Sticky Heritage Header -->
+    <header class="bg-ivory/95 backdrop-blur-md border-b-2 border-gold/40 sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between py-3 gap-3">
+          <!-- Stitch Log Emblem & Shop Identity -->
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <a href="javascript:void(0)" onclick="switchMainTab('ledger')" class="font-editorial text-3xl sm:text-4xl font-bold text-espresso hover:text-forest leading-none transition-colors">
+                Stitch Log
+              </a>
+              <p class="hidden sm:block text-xs text-taupe border-l border-gold/40 pl-3">
+                <span data-i18n="masterTailor">Master Tailor</span>: <strong id="header-tailor-name" class="text-espresso font-semibold">Aarav Kulkarni</strong>
+              </p>
+            </div>
+
+            <!-- Mobile Quick Controls -->
+            <div class="flex lg:hidden items-center gap-2">
+              <select id="header-lang-mobile" onchange="changeLanguage(this.value)" aria-label="Language" class="bg-parchment border border-gold/50 rounded-full px-2.5 py-1.5 text-xs font-semibold text-forest"></select>
+              <button onclick="logoutTailor()" title="Log Out" class="p-2 rounded-full bg-roseBlush text-forest border border-roseDust">
+                <i class="ph-bold ph-sign-out text-base"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Primary Navigation Bar -->
+          <nav class="flex items-center gap-1 overflow-x-auto pb-1 lg:pb-0 bg-parchment/90 p-1 rounded-full border border-gold/35" aria-label="Stitch Log Navigation">
+            <button onclick="switchMainTab('ledger')" id="mnav-ledger" class="mnav-btn px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap flex items-center gap-1.5 bg-forest text-ivory shadow-sm transition-all">
+              <i class="ph-fill ph-book-open-text text-roseDust"></i>
+              <span data-i18n="navLedger">Measurements &amp; Orders</span>
+            </button>
+            <button onclick="switchMainTab('deliveries')" id="mnav-deliveries" class="mnav-btn px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap flex items-center gap-1.5 text-espresso hover:text-forest transition-all">
+              <i class="ph-fill ph-truck text-roseDeep"></i>
+              <span data-i18n="navDeliveries">Deliveries &amp; Reminders</span>
+              <span id="nav-overdue-badge" class="hidden px-1.5 py-0.5 rounded-full text-[10px] bg-roseDeep text-ivory font-extrabold tabular-nums">0</span>
+            </button>
+            <button onclick="switchMainTab('settings')" id="mnav-settings" class="mnav-btn px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap flex items-center gap-1.5 text-espresso hover:text-forest transition-all">
+              <i class="ph-fill ph-gear-six text-forest"></i>
+              <span data-i18n="navSettings">Shop Settings</span>
+            </button>
+          </nav>
+
+          <!-- Desktop Language & Logout -->
+          <div class="hidden lg:flex items-center gap-2.5">
+            <div class="flex items-center gap-1.5 bg-white border border-gold/50 rounded-full px-3 py-1.5">
+              <i class="ph ph-translate text-roseDeep text-sm"></i>
+              <select id="header-lang-desktop" onchange="changeLanguage(this.value)" aria-label="Language Selector" class="bg-transparent text-xs font-semibold text-forest focus:outline-none cursor-pointer"></select>
+            </div>
+            <button onclick="logoutTailor()" class="btn-tactile px-3.5 py-1.5 rounded-full bg-roseBlush hover:bg-roseDust/60 text-forest border border-roseDust text-xs font-bold flex items-center gap-1.5">
+              <i class="ph-bold ph-sign-out"></i>
+              <span data-i18n="logout">Log Out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Body -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-7 space-y-7">
+      <!-- =========================================================
+           TAB 1: MEASUREMENTS LEDGER, ORDERS & SMART COMPARISON
+           ========================================================= -->
+      <section id="tab-ledger" class="space-y-6">
+        <!-- Quick Actions Row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 no-print" aria-label="Quick actions">
+          <button onclick="openCustomerOrderModal()" class="btn-tactile rounded-2xl p-4 bg-forest hover:bg-forestLight text-ivory border-2 border-gold shadow-card text-left flex items-center gap-3.5">
+            <span class="w-11 h-11 rounded-full bg-white/10 border border-gold/40 flex items-center justify-center shrink-0">
+              <i class="ph-fill ph-plus-circle text-2xl text-roseDust"></i>
+            </span>
+            <span>
+              <strong class="block text-sm font-bold" data-i18n="qaAddTitle">Add Customer &amp; Order</strong>
+              <span class="text-xs text-goldLight" data-i18n="qaAddSub">Save measurements, fabric &amp; date</span>
+            </span>
+          </button>
+
+          <button onclick="switchMainTab('deliveries')" class="btn-tactile rounded-2xl p-4 bg-white hover:bg-roseTint text-forest border-heirloom shadow-card text-left flex items-center gap-3.5">
+            <span class="w-11 h-11 rounded-full bg-roseBlush border border-roseDust flex items-center justify-center shrink-0">
+              <i class="ph-fill ph-truck text-2xl text-roseDeep"></i>
+            </span>
+            <span>
+              <strong class="block text-sm font-bold" data-i18n="qaDelivTitle">View Deliveries</strong>
+              <span class="text-xs text-taupe" data-i18n="qaDelivSub">Check due, ready &amp; overdue orders</span>
+            </span>
+          </button>
+
+          <button onclick="document.getElementById('search-input').focus(); document.getElementById('search-input').scrollIntoView({behavior: 'smooth', block: 'center'});" class="btn-tactile rounded-2xl p-4 bg-white hover:bg-parchment/70 text-forest border-heirloom shadow-card text-left flex items-center gap-3.5">
+            <span class="w-11 h-11 rounded-full bg-parchment border border-gold/50 flex items-center justify-center shrink-0">
+              <i class="ph-fill ph-magnifying-glass text-2xl text-forest"></i>
+            </span>
+            <span>
+              <strong class="block text-sm font-bold" data-i18n="qaFindTitle">Find a Customer</strong>
+              <span class="text-xs text-taupe" data-i18n="qaFindSub">Search by name, phone, or dress</span>
+            </span>
+          </button>
+        </div>
+
+        <!-- 4 KPI Counters -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white/95 rounded-2xl p-4 sm:p-5 border-heirloom shadow-card flex items-center justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-widest text-taupe font-bold" data-i18n="kpiFolios">Client Folios</p>
+              <p id="kpi-total-clients" class="font-editorial text-3xl font-bold text-forest mt-1 tabular-nums">0</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-roseBlush border border-roseDust flex items-center justify-center text-roseDeep">
+              <i class="ph-fill ph-users text-xl"></i>
+            </div>
+          </div>
+
+          <div class="bg-white/95 rounded-2xl p-4 sm:p-5 border-heirloom shadow-card flex items-center justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-widest text-taupe font-bold" data-i18n="kpiActive">Active Orders</p>
+              <p id="kpi-active-orders" class="font-editorial text-3xl font-bold text-forest mt-1 tabular-nums">0</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-parchment border border-gold/50 flex items-center justify-center text-forest">
+              <i class="ph-fill ph-needle text-xl"></i>
+            </div>
+          </div>
+
+          <div class="bg-white/95 rounded-2xl p-4 sm:p-5 border-heirloom shadow-card flex items-center justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-widest text-taupe font-bold" data-i18n="kpiOverdue">Overdue Alerts</p>
+              <p id="kpi-overdue-orders" class="font-editorial text-3xl font-bold text-roseDeep mt-1 tabular-nums">0</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-roseBlush border border-roseDust flex items-center justify-center text-roseDeep">
+              <i class="ph-fill ph-warning-circle text-xl"></i>
+            </div>
+          </div>
+
+          <div class="bg-white/95 rounded-2xl p-4 sm:p-5 border-heirloom shadow-card flex items-center justify-between">
+            <div>
+              <p class="text-[11px] uppercase tracking-widest text-taupe font-bold" data-i18n="kpiReady">Ready for Delivery</p>
+              <p id="kpi-completed-orders" class="font-editorial text-3xl font-bold text-forest mt-1 tabular-nums">0</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-parchment border border-gold/50 flex items-center justify-center text-gold">
+              <i class="ph-fill ph-crown-simple text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ledger Filter Switcher, Search & New Customer/Order Button -->
+        <div class="bg-white/95 rounded-2xl p-4 sm:p-5 border-heirloom shadow-editorial flex flex-col lg:flex-row lg:items-center justify-between gap-4 no-print">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs uppercase tracking-widest text-taupe font-bold mr-1" data-i18n="ledgerLabel">Ledger:</span>
+            <button onclick="setGenderLedger('All')" data-gender="All" class="gender-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-roseBlush text-forest border border-roseDust transition-all">
+              <span data-i18n="allClients">All Clients</span>
+            </button>
+            <button onclick="setGenderLedger('Women')" data-gender="Women" class="gender-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-ivory text-taupe border border-gold/40 hover:border-roseDust transition-all flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-roseDeep"></span>
+              <span data-i18n="womensLedger">Women's Ledger (in)</span>
+            </button>
+            <button onclick="setGenderLedger('Men')" data-gender="Men" class="gender-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-ivory text-taupe border border-gold/40 hover:border-roseDust transition-all flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-forest"></span>
+              <span data-i18n="mensLedger">Men's Ledger (in)</span>
+            </button>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2.5">
+            <div class="relative flex-1 sm:w-60">
+              <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-taupe text-sm"></i>
+              <input id="search-input" oninput="renderCustomerOrders()" type="text" data-i18n-placeholder="searchPlaceholder" placeholder="Search name, phone, garment..." class="w-full bg-ivory border border-gold/50 rounded-full pl-9 pr-4 py-2 text-xs text-espresso focus:outline-none focus:border-roseDust" />
+            </div>
+            <select id="stage-filter" onchange="renderCustomerOrders()" aria-label="Filter by Order Stage" class="bg-ivory border border-gold/50 rounded-full px-3.5 py-2 text-xs font-semibold text-espresso focus:outline-none focus:border-roseDust">
+              <option value="All">All Stages</option>
+              <option value="Measurement Taken">Measurement Taken</option>
+              <option value="Cutting">Cutting</option>
+              <option value="First Fitting">First Fitting</option>
+              <option value="Stitching">Stitching</option>
+              <option value="Quality Check">Quality Check</option>
+              <option value="Ready for Delivery">Ready for Delivery</option>
+            </select>
+            <button onclick="openInchCmHelperModal()" class="btn-tactile bg-parchment hover:bg-roseBlush/60 text-forest px-3.5 py-2.5 rounded-full text-xs font-bold border border-gold/50 flex items-center gap-1.5">
+              <i class="ph ph-ruler text-roseDeep text-sm"></i>
+              <span data-i18n="inchCmGuide">In / CM Guide</span>
+            </button>
+            <button onclick="openCustomerOrderModal()" class="btn-tactile bg-forest hover:bg-forestLight text-ivory px-4 sm:px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold border border-gold shadow-sm flex items-center gap-2">
+              <i class="ph-fill ph-plus-circle text-roseDust text-base"></i>
+              <span data-i18n="newOrderBtn">New Customer &amp; Order</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Customer & Order Cards Grid -->
+        <div id="orders-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+
+        <!-- Empty State -->
+        <div id="orders-empty" class="hidden bg-white/95 rounded-3xl p-12 border-heirloom text-center max-w-lg mx-auto">
+          <div class="w-16 h-16 rounded-full bg-roseBlush mx-auto flex items-center justify-center text-roseDeep border border-roseDust mb-4">
+            <i class="ph ph-scissors text-3xl"></i>
+          </div>
+          <h3 class="font-editorial text-2xl font-bold text-forest" data-i18n="emptyTitle">No Matching Customer Folios</h3>
+          <p class="text-xs text-taupe mt-2" data-i18n="emptyDesc">Try clearing your search filter or add a new customer measurement &amp; order entry.</p>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           TAB 2: DELIVERY DASHBOARD, OVERDUE ORDERS & REMINDERS
+           ========================================================= -->
+      <section id="tab-deliveries" class="hidden space-y-6">
+        <div class="bg-white/95 rounded-2xl p-5 border-heirloom shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-editorial text-2xl sm:text-3xl font-bold text-forest" data-i18n="delivTitle">Delivery Schedule &amp; Overdue Watch</h2>
+            <p class="text-xs text-taupe mt-0.5" data-i18n="delivDesc">Track overdue garments, upcoming handovers, and log client delivery reminders.</p>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="px-3 py-1 rounded-full bg-roseBlush text-forest border border-roseDust font-bold tabular-nums">
+              <span data-i18n="overduePill">Overdue:</span> <span id="deliv-overdue-count">0</span>
+            </span>
+            <span class="px-3 py-1 rounded-full bg-parchment text-forest border border-gold/45 font-bold tabular-nums">
+              <span data-i18n="upcomingPill">Upcoming:</span> <span id="deliv-upcoming-count">0</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Overdue Section -->
+        <div class="space-y-3">
+          <h3 class="font-editorial text-xl font-bold text-roseDeep flex items-center gap-2">
+            <i class="ph-fill ph-warning-circle"></i>
+            <span data-i18n="overdueHeading">Overdue Deliveries (Requires Immediate Attention)</span>
+          </h3>
+          <div id="overdue-orders-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- Upcoming & Scheduled Deliveries -->
+        <div class="space-y-3">
+          <h3 class="font-editorial text-xl font-bold text-forest flex items-center gap-2">
+            <i class="ph-fill ph-calendar-check text-gold"></i>
+            <span data-i18n="upcomingHeading">Scheduled &amp; Ready Deliveries</span>
+          </h3>
+          <div id="upcoming-orders-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           TAB 3: SHOP & TAILOR ACCOUNT SETTINGS
+           ========================================================= -->
+      <section id="tab-settings" class="hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Profile & Language Settings -->
+          <div class="lg:col-span-7 bg-white/95 rounded-3xl p-6 border-heirloom shadow-card space-y-4">
+            <h2 class="font-editorial text-2xl font-bold text-forest border-b border-gold/25 pb-3" data-i18n="settingsTitle">Stitch Log Shop &amp; Tailor Settings</h2>
+
+            <form onsubmit="saveBoutiqueSettings(event)" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1" data-i18n="settingsShopName">Shop Name</label>
+                  <input id="set-boutique-name" type="text" required class="w-full bg-ivory border border-gold/50 rounded-xl px-4 py-2.5 text-sm text-espresso" />
+                </div>
+                <div>
+                  <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1" data-i18n="settingsTailorName">Master Tailor Name</label>
+                  <input id="set-tailor-name" type="text" required class="w-full bg-ivory border border-gold/50 rounded-xl px-4 py-2.5 text-sm text-espresso" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1" data-i18n="settingsLangLabel">Atelier Language (11 Languages)</label>
+                <select id="set-language" onchange="changeLanguage(this.value)" class="w-full bg-ivory border border-gold/50 rounded-xl px-4 py-2.5 text-sm text-espresso"></select>
+              </div>
+              <div class="pt-2 flex flex-wrap items-center gap-3">
+                <button type="submit" class="btn-tactile px-6 py-2.5 rounded-full bg-forest text-ivory text-xs sm:text-sm font-bold border border-gold">
+                  <span data-i18n="saveShopBtn">Save Shop Profile</span>
+                </button>
+                <button type="button" onclick="window.print()" class="btn-tactile px-4 py-2.5 rounded-full bg-parchment text-forest text-xs font-bold border border-gold/45 flex items-center gap-1.5">
+                  <i class="ph-bold ph-printer"></i>
+                  <span data-i18n="printLedgerBtn">Print Ledger Summary</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Archive & Permanent Account Deletion -->
+          <div class="lg:col-span-5 bg-white/95 rounded-3xl p-6 border-rose-hairline shadow-card space-y-4 flex flex-col justify-between">
+            <div>
+              <h3 class="font-editorial text-2xl font-bold text-forest border-b border-roseDust/40 pb-3" data-i18n="archiveTitle">Archive &amp; Account Controls</h3>
+              <p class="text-xs text-taupe mt-3 leading-relaxed" data-i18n="archiveDesc">
+                Restore sample customer folios, measurements, and dated fabrics, or permanently delete your tailor account and all stored records.
+              </p>
+              <div class="mt-5 space-y-2.5">
+                <button onclick="promptRestoreSampleAtelier()" class="w-full py-2.5 px-4 rounded-xl bg-ivory hover:bg-parchment border border-gold/50 text-xs font-bold text-forest flex items-center justify-between">
+                  <span data-i18n="restoreSampleBtn">Restore Sample Atelier Data</span>
+                  <i class="ph-bold ph-arrow-counter-clockwise text-gold text-base"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="pt-5 mt-5 border-t border-roseDust/50">
+              <p class="text-[11px] uppercase tracking-wider font-extrabold text-roseDeep mb-2" data-i18n="dangerZone">Danger Zone</p>
+              <button onclick="promptDeleteTailorAccount()" class="btn-tactile w-full py-3 px-4 rounded-xl bg-roseBlush hover:bg-roseDust/70 border border-roseDeep text-xs font-extrabold text-forest flex items-center justify-center gap-2">
+                <i class="ph-bold ph-trash text-roseDeep text-base"></i>
+                <span data-i18n="deleteAccountBtn">Delete Tailor Account &amp; Settings</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- =========================================================
+       MODAL 1: ADD / EDIT CUSTOMER & MEASUREMENT ORDER MODAL
+       ========================================================= -->
+  <div id="customer-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-espresso/55 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-ivory rounded-3xl max-w-4xl w-full border-2 border-gold shadow-2xl overflow-hidden my-auto">
+      <div class="bg-forest text-ivory px-6 py-4 flex items-center justify-between border-b border-gold/50">
+        <div>
+          <h3 id="cm-modal-title" class="font-editorial text-2xl font-bold">New Customer Measurement &amp; Order</h3>
+          <p class="text-xs text-roseDust">Measurements in inches ("). Add dated fabric &amp; reference photos under one customer folio.</p>
+        </div>
+        <button onclick="closeCustomerModal()" aria-label="Close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-ivory">
+          <i class="ph-bold ph-x text-lg"></i>
+        </button>
+      </div>
+
+      <form id="customer-order-form" onsubmit="saveCustomerOrderForm(event)" class="p-6 space-y-6 max-h-[82vh] overflow-y-auto">
+        <input type="hidden" id="cm-edit-id" />
+
+        <!-- Basic Client & Order Details -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1">Customer Name *</label>
+            <input id="cm-name" type="text" required placeholder="e.g., Meera Iyer" class="w-full bg-white border border-gold/50 rounded-xl px-3.5 py-2 text-sm text-espresso" />
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1">Phone Number *</label>
+            <input id="cm-phone" type="tel" required placeholder="+91 98401 22110" class="w-full bg-white border border-gold/50 rounded-xl px-3.5 py-2 text-sm text-espresso font-mono" />
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1">Ledger Category</label>
+            <select id="cm-gender" onchange="renderMeasurementInputs()" class="w-full bg-white border border-gold/50 rounded-xl px-3.5 py-2 text-sm text-espresso font-bold">
+              <option value="Women">Women's Ledger</option>
+              <option value="Men">Men's Ledger</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1">Delivery Date *</label>
+            <input id="cm-delivery-date" type="date" required class="w-full bg-white border border-gold/50 rounded-xl px-3.5 py-2 text-sm text-espresso font-mono" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1">Garment Type *</label>
+            <input id="cm-garment" type="text" required placeholder="e.g., Silk Blouse, Bandhgala, Lehenga" class="w-full bg-white border border-gold/50 rounded-xl px-3.5 py-2 text-sm text-espresso" />
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1">Order Progress Stage</label>
+            <select id="cm-stage" class="w-full bg-white border border-gold/50 rounded-xl px-3.5 py-2 text-sm text-espresso">
+              <option value="Measurement Taken">Measurement Taken</option>
+              <option value="Cutting">Cutting</option>
+              <option value="First Fitting">First Fitting</option>
+              <option value="Stitching">Stitching</option>
+              <option value="Quality Check">Quality Check</option>
+              <option value="Ready for Delivery">Ready for Delivery</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1">Selected Reference Design</label>
+            <input id="cm-design-name" type="text" placeholder="e.g., Boat Neck Zardozi / Classic Mandarin" class="w-full bg-white border border-gold/50 rounded-xl px-3.5 py-2 text-sm text-espresso" />
+          </div>
+        </div>
+
+        <!-- Dynamic Women's or Men's Measurements (in inches) -->
+        <div class="bg-white/95 rounded-2xl p-4 sm:p-5 border-heirloom">
+          <div class="flex items-center justify-between mb-3">
+            <h4 id="cm-meas-heading" class="font-editorial text-xl font-bold text-forest">Women's Measurements (in inches)</h4>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-roseBlush text-forest border border-roseDust font-semibold">Units: Inches (")</span>
+          </div>
+          <div id="cm-measurements-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+        </div>
+
+        <!-- Customer Style Preferences -->
+        <div class="bg-roseTint/80 rounded-2xl p-4 sm:p-5 border-rose-hairline space-y-3">
+          <h4 class="font-editorial text-xl font-bold text-forest flex items-center gap-2">
+            <i class="ph-fill ph-sparkle text-roseDeep"></i>
+            <span>Customer Style Preferences</span>
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider font-bold text-taupe mb-1">Fit Preference</label>
+              <select id="cm-fit-pref" class="w-full bg-white border border-gold/45 rounded-xl px-3 py-2 text-xs text-espresso">
+                <option value="Slim / Tailored">Slim / Tailored</option>
+                <option value="Classic / Balanced Ease" selected>Classic / Balanced Ease</option>
+                <option value="Relaxed / Airy">Relaxed / Airy</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider font-bold text-taupe mb-1">Neck / Collar / Cuff Style</label>
+              <input id="cm-neck-pref" type="text" placeholder="e.g., Sweetheart, French cuff" class="w-full bg-white border border-gold/45 rounded-xl px-3 py-2 text-xs text-espresso" />
+            </div>
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider font-bold text-taupe mb-1">Lining &amp; Comfort Notes</label>
+              <input id="cm-comfort-pref" type="text" placeholder="e.g., Pure cotton mulmul lining, no stiff canvas" class="w-full bg-white border border-gold/45 rounded-xl px-3 py-2 text-xs text-espresso" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Date-Stamped Fabric & Reference Design Photo Log -->
+        <div class="bg-white/95 rounded-2xl p-4 sm:p-5 border-heirloom space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h4 class="font-editorial text-xl font-bold text-forest flex items-center gap-2">
+                <i class="ph-fill ph-images text-roseDeep"></i>
+                <span>Fabric &amp; Reference Photos by Date Given</span>
+              </h4>
+              <p class="text-[11px] text-taupe">Pick the date the customer brought the fabrics &amp; reference photos—add multiple visits to the same folio.</p>
+            </div>
+            <div class="flex items-center gap-2 bg-ivory px-3 py-1.5 rounded-full border border-gold/50">
+              <label for="cm-photo-date" class="text-[11px] uppercase tracking-wider font-bold text-taupe">Date Given:</label>
+              <input id="cm-photo-date" type="date" class="bg-transparent text-xs font-mono font-bold text-espresso focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-ivory/80 rounded-2xl p-4 border border-gold/35 space-y-2.5">
+              <label class="block text-xs uppercase tracking-wider font-bold text-taupe">Fabric Photo(s)</label>
+              <input id="cm-fabric-file" type="file" accept="image/*" multiple onchange="handlePhotoFileUpload(event, 'fabric')" class="block w-full text-xs text-taupe file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-roseBlush file:text-forest hover:file:bg-roseDust/60" />
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="applyPresetPhoto('fabric', 'roseSilk')" class="text-[11px] px-2.5 py-1 rounded-full bg-roseBlush text-forest font-semibold border border-roseDust">Rose Silk Swatch</button>
+                <button type="button" onclick="applyPresetPhoto('fabric', 'ivoryLinen')" class="text-[11px] px-2.5 py-1 rounded-full bg-parchment text-forest font-semibold border border-gold/40">Ivory Linen</button>
+                <button type="button" onclick="applyPresetPhoto('fabric', 'forestVelvet')" class="text-[11px] px-2.5 py-1 rounded-full bg-forest text-ivory font-semibold">Forest Velvet</button>
+              </div>
+              <img id="cm-fabric-preview" src="" alt="Fabric Preview" class="w-full h-28 object-cover rounded-xl border border-gold/30 hidden" />
+              <input type="hidden" id="cm-fabric-data" />
+            </div>
+
+            <div class="bg-ivory/80 rounded-2xl p-4 border border-gold/35 space-y-2.5">
+              <label class="block text-xs uppercase tracking-wider font-bold text-taupe">Reference Design Photo(s)</label>
+              <input id="cm-design-file" type="file" accept="image/*" multiple onchange="handlePhotoFileUpload(event, 'design')" class="block w-full text-xs text-taupe file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-roseBlush file:text-forest hover:file:bg-roseDust/60" />
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="applyPresetPhoto('design', 'coutureSketch')" class="text-[11px] px-2.5 py-1 rounded-full bg-roseBlush text-forest font-semibold border border-roseDust">Couture Sketch</button>
+                <button type="button" onclick="applyPresetPhoto('design', 'embroideryMotif')" class="text-[11px] px-2.5 py-1 rounded-full bg-parchment text-forest font-semibold border border-gold/40">Embroidery Motif</button>
+              </div>
+              <img id="cm-design-preview" src="" alt="Design Preview" class="w-full h-28 object-cover rounded-xl border border-gold/30 hidden" />
+              <input type="hidden" id="cm-design-data" />
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
+            <input id="cm-photo-batch-note" type="text" placeholder="Optional note for this date (e.g., Week 2 Festive Blouse Fabric & Neck Reference)" class="flex-1 bg-ivory border border-gold/45 rounded-xl px-3.5 py-2 text-xs text-espresso" />
+            <button type="button" onclick="stagePhotoBatchInModal()" class="btn-tactile px-4 py-2 rounded-full bg-roseBlush hover:bg-roseDust/60 text-forest border border-roseDust text-xs font-bold flex items-center justify-center gap-1.5 shrink-0">
+              <i class="ph-bold ph-calendar-plus text-roseDeep text-sm"></i>
+              <span>Add Date Entry to Log</span>
+            </button>
+          </div>
+
+          <div id="cm-photo-log-list" class="space-y-2"></div>
+        </div>
+
+        <!-- Tailoring Notes -->
+        <div>
+          <label class="block text-xs uppercase tracking-wider font-bold text-taupe mb-1">Master Tailoring Notes</label>
+          <textarea id="cm-notes" rows="2" placeholder="Seam allowance instructions, posture notes, or special requests..." class="w-full bg-white border border-gold/50 rounded-xl px-4 py-2 text-sm text-espresso"></textarea>
+        </div>
+
+        <div class="pt-4 border-t border-gold/30 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeCustomerModal()" class="px-5 py-2.5 rounded-full border border-gold/45 text-xs font-bold text-taupe">Cancel</button>
+          <button type="submit" class="btn-tactile px-6 py-2.5 rounded-full bg-forest text-ivory text-xs sm:text-sm font-bold border border-gold shadow-sm flex items-center gap-2">
+            <i class="ph-fill ph-seal-check text-roseDust"></i>
+            <span>Save Folio &amp; Measurements</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 2: FULL CUSTOMER PROFILE, DATED PHOTOS, COMPARISON & FITTINGS
+       ========================================================= -->
+  <div id="detail-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-espresso/55 backdrop-blur-xs p-3 sm:p-4 overflow-y-auto">
+    <div id="detail-modal-card" class="bg-ivory rounded-3xl max-w-4xl w-full border-2 border-gold shadow-2xl overflow-hidden my-auto"></div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 3: CONFIRMATION DIALOG
+       ========================================================= -->
+  <div id="confirm-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-espresso/55 backdrop-blur-xs p-4">
+    <div class="bg-ivory rounded-3xl max-w-sm w-full border-2 border-gold shadow-2xl p-6 text-center">
+      <div class="w-12 h-12 rounded-full bg-roseBlush mx-auto flex items-center justify-center text-roseDeep border border-roseDust mb-3">
+        <i class="ph-fill ph-warning-circle text-2xl"></i>
+      </div>
+      <h4 id="confirm-title" class="font-editorial text-2xl font-bold text-forest">Confirm Action</h4>
+      <p id="confirm-message" class="text-xs text-taupe mt-2 leading-relaxed"></p>
+      <div class="mt-6 flex items-center justify-center gap-3">
+        <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-full border border-gold/45 text-xs font-bold text-taupe">Cancel</button>
+        <button id="confirm-proceed-btn" class="px-5 py-2 rounded-full bg-forest text-ivory text-xs font-bold border border-gold">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       APPLICATION JAVASCRIPT
+       ========================================================= -->
+  <script>
+    const ATELIER_KEY = 'stitch_log_atelier_v3';
+
+    const ORDER_STAGES = [
+      'Measurement Taken',
+      'Cutting',
+      'First Fitting',
+      'Stitching',
+      'Quality Check',
+      'Ready for Delivery'
+    ];
+
+    const STAGE_I18N_KEYS = {
+      'Measurement Taken': 'stageMeasurement',
+      'Cutting': 'stageCutting',
+      'First Fitting': 'stageFitting',
+      'Stitching': 'stageStitching',
+      'Quality Check': 'stageQualityCheck',
+      'Ready for Delivery': 'stageReady'
+    };
+
+    const QUALITY_CHECKLIST_TEMPLATE = [
+      { id: 'qc1', label: 'Seam allowance & French/serged edge finish verified' },
+      { id: 'qc2', label: 'Lining grainline & ease aligned without pulling' },
+      { id: 'qc3', label: 'Zipper, hook-and-eye, or button placket sits flat' },
+      { id: 'qc4', label: 'Hemline levelness & blind-stitch tension checked' },
+      { id: 'qc5', label: 'Sleeve cap ease & armhole mobility tested' },
+      { id: 'qc6', label: 'Final steam press & loose threads cleared' }
+    ];
+
+    const WOMEN_MEASUREMENTS = [
+      { key: 'bust', label: 'Bust' },
+      { key: 'underbust', label: 'Underbust' },
+      { key: 'waist', label: 'Waist' },
+      { key: 'hip', label: 'Hip' },
+      { key: 'shoulder', label: 'Shoulder' },
+      { key: 'sleeveLength', label: 'Sleeve Length' },
+      { key: 'garmentLength', label: 'Blouse / Kurti Length' },
+      { key: 'neckDepth', label: 'Neck Depth' }
+    ];
+
+    const MEN_MEASUREMENTS = [
+      { key: 'chest', label: 'Chest' },
+      { key: 'waist', label: 'Waist' },
+      { key: 'shoulder', label: 'Shoulder' },
+      { key: 'sleeveLength', label: 'Sleeve Length' },
+      { key: 'shirtKurtaLength', label: 'Shirt / Kurta Length' },
+      { key: 'collar', label: 'Collar' },
+      { key: 'inseam', label: 'Inseam' }
+    ];
+
+    const LANGUAGES = [
+      { code: 'en', label: 'English' },
+      { code: 'hi', label: 'हिन्दी (Hindi)' },
+      { code: 'ta', label: 'தமிழ் (Tamil)' },
+      { code: 'mr', label: 'मराठी (Marathi)' },
+      { code: 'te', label: 'తెలుగు (Telugu)' },
+      { code: 'kn', label: 'ಕನ್ನಡ (Kannada)' },
+      { code: 'ml', label: 'മലയാളം (Malayalam)' },
+      { code: 'pa', label: 'ਪੰਜਾਬੀ (Punjabi)' },
+      { code: 'bho', label: 'भोजपुरी (Bhojpuri)' },
+      { code: 'or', label: 'ଓଡ଼ିଆ (Odia)' },
+      { code: 'bn', label: 'বাংলা (Bengali)' }
+    ];
+
+    const BASE_UI_STRINGS = {
+      login: 'Atelier Login',
+      createAccount: 'Create Account',
+      welcomeBack: 'Welcome Back, Master Tailor',
+      loginDesc: 'Sign in to access your Stitch Log measurements, orders, and client fittings.',
+      enterAtelier: 'Enter Stitch Log',
+      demoAccount: 'Demo Account',
+      tailorEmailLabel: 'Tailor Email or Name',
+      passcodeLabel: 'Passcode / Password',
+      createAccountTitle: 'Create Tailor Account',
+      createAccountDesc: 'Set up your Stitch Log shop identity and master tailor login.',
+      shopNameLabel: 'Shop Name *',
+      tailorNameLabel: 'Tailor Name *',
+      emailIdLabel: 'Email / Login ID *',
+      passwordLabel: 'Password *',
+      preferredLangLabel: 'Preferred Language',
+      saveAccountBtn: 'Save Account & Open Stitch Log',
+      masterTailor: 'Master Tailor',
+      logout: 'Log Out',
+      navLedger: 'Measurements & Orders',
+      navDeliveries: 'Deliveries & Reminders',
+      navSettings: 'Shop Settings',
+      qaAddTitle: 'Add Customer & Order',
+      qaAddSub: 'Save measurements, fabric & date',
+      qaDelivTitle: 'View Deliveries',
+      qaDelivSub: 'Check due, ready & overdue orders',
+      qaFindTitle: 'Find a Customer',
+      qaFindSub: 'Search by name, phone, or dress',
+      kpiFolios: 'Client Folios',
+      kpiActive: 'Active Orders',
+      kpiOverdue: 'Overdue Alerts',
+      kpiReady: 'Ready for Delivery',
+      ledgerLabel: 'Ledger:',
+      allClients: 'All Clients',
+      womensLedger: "Women's Ledger (in)",
+      mensLedger: "Men's Ledger (in)",
+      searchPlaceholder: 'Search name, phone, garment...',
+      allStages: 'All Stages',
+      stageMeasurement: 'Measurement Taken',
+      stageCutting: 'Cutting',
+      stageFitting: 'First Fitting',
+      stageStitching: 'Stitching',
+      stageQualityCheck: 'Quality Check',
+      stageReady: 'Ready for Delivery',
+      inchCmGuide: 'In / CM Guide',
+      newOrderBtn: 'New Customer & Order',
+      emptyTitle: 'No Matching Customer Folios',
+      emptyDesc: 'Try clearing your search filter or add a new customer measurement & order entry.',
+      overdueBadge: 'Overdue',
+      remindedBadge: 'Reminded',
+      duePrefix: 'Due',
+      folioAndFit: 'Folio & Fit',
+      stageBtn: 'Stage',
+      delivTitle: 'Delivery Schedule & Overdue Watch',
+      delivDesc: 'Track overdue garments, upcoming handovers, and log client delivery reminders.',
+      overduePill: 'Overdue:',
+      upcomingPill: 'Upcoming:',
+      overdueHeading: 'Overdue Deliveries (Requires Immediate Attention)',
+      upcomingHeading: 'Scheduled & Ready Deliveries',
+      noOverdueMsg: 'No overdue orders. All active garments are within their delivery dates.',
+      noUpcomingMsg: 'No scheduled orders found.',
+      reminderNone: 'No reminder sent yet',
+      sendReminder: 'Send Reminder',
+      reRemind: 'Re-Remind',
+      nextStage: 'Next Stage',
+      settingsTitle: 'Stitch Log Shop & Tailor Settings',
+      settingsShopName: 'Shop Name',
+      settingsTailorName: 'Master Tailor Name',
+      settingsLangLabel: 'Atelier Language (11 Languages)',
+      saveShopBtn: 'Save Shop Profile',
+      printLedgerBtn: 'Print Ledger Summary',
+      archiveTitle: 'Archive & Account Controls',
+      archiveDesc: 'Restore sample customer folios, measurements, and dated fabrics, or permanently delete your tailor account and all stored records.',
+      restoreSampleBtn: 'Restore Sample Atelier Data',
+      dangerZone: 'Danger Zone',
+      deleteAccountBtn: 'Delete Tailor Account & Settings'
+    };
+
+    const TRANSLATED_OVERRIDES = {
+      hi: {
+        login: 'अटेलियर लॉगिन',
+        createAccount: 'खाता बनाएं',
+        welcomeBack: 'स्वागत है, मास्टर टेलर',
+        loginDesc: 'अपने स्टिच लॉग माप, ऑर्डर और फिटिंग देखने के लिए साइन इन करें।',
+        enterAtelier: 'स्टिच लॉग खोलें',
+        demoAccount: 'डेमो खाता',
+        tailorEmailLabel: 'टेलर ईमेल या नाम',
+        passcodeLabel: 'पासकोड / पासवर्ड',
+        createAccountTitle: 'टेलर खाता बनाएं',
+        createAccountDesc: 'अपनी स्टिच लॉग दुकान की पहचान और मास्टर टेलर लॉगिन सेट करें।',
+        shopNameLabel: 'दुकान का नाम *',
+        tailorNameLabel: 'टेलर का नाम *',
+        emailIdLabel: 'ईमेल / लॉगिन आईडी *',
+        passwordLabel: 'पासवर्ड *',
+        preferredLangLabel: 'पसंदीदा भाषा',
+        saveAccountBtn: 'खाता सहेजें और स्टिच लॉग खोलें',
+        masterTailor: 'मास्टर टेलर',
+        logout: 'लॉग आउट',
+        navLedger: 'माप और ऑर्डर',
+        navDeliveries: 'डिलीवरी और रिमाइंडर',
+        navSettings: 'दुकान सेटिंग्स',
+        qaAddTitle: 'ग्राहक और ऑर्डर जोड़ें',
+        qaAddSub: 'माप, कपड़ा और तारीख सहेजें',
+        qaDelivTitle: 'डिलीवरी देखें',
+        qaDelivSub: 'तैयार, देय और विलंबित ऑर्डर जांचें',
+        qaFindTitle: 'ग्राहक खोजें',
+        qaFindSub: 'नाम, फोन या पोशाक से खोजें',
+        kpiFolios: 'ग्राहक रिकॉर्ड',
+        kpiActive: 'सक्रिय ऑर्डर',
+        kpiOverdue: 'विलंबित अलर्ट',
+        kpiReady: 'डिलीवरी के लिए तैयार',
+        ledgerLabel: 'लेजर:',
+        allClients: 'सभी ग्राहक',
+        womensLedger: 'महिला लेजर (इंच)',
+        mensLedger: 'पुरुष लेजर (इंच)',
+        searchPlaceholder: 'नाम, फोन, पोशाक खोजें...',
+        allStages: 'सभी चरण',
+        stageMeasurement: 'माप लिया गया',
+        stageCutting: 'कटिंग',
+        stageFitting: 'पहली फिटिंग',
+        stageStitching: 'सिलाई',
+        stageQualityCheck: 'गुणवत्ता जांच',
+        stageReady: 'डिलीवरी के लिए तैयार',
+        inchCmGuide: 'इंच / सेमी गाइड',
+        newOrderBtn: 'नया ग्राहक और ऑर्डर',
+        emptyTitle: 'कोई ग्राहक रिकॉर्ड नहीं मिला',
+        emptyDesc: 'खोज फ़िल्टर साफ़ करें या नया ग्राहक माप व ऑर्डर जोड़ें।',
+        overdueBadge: 'विलंबित',
+        remindedBadge: 'रिमाइंड भेजा गया',
+        duePrefix: 'देय',
+        folioAndFit: 'फ़ोलियो और फिट',
+        stageBtn: 'चरण',
+        delivTitle: 'डिलीवरी समय-सारणी और विलंब निगरानी',
+        delivDesc: 'विलंबित पोशाक, आगामी डिलीवरी और ग्राहक रिमाइंडर ट्रैक करें।',
+        overduePill: 'विलंबित:',
+        upcomingPill: 'आगामी:',
+        overdueHeading: 'विलंबित डिलीवरी (तुरंत ध्यान दें)',
+        upcomingHeading: 'निर्धारित और तैयार डिलीवरी',
+        noOverdueMsg: 'कोई विलंबित ऑर्डर नहीं है। सभी सक्रिय पोशाक समय पर हैं।',
+        noUpcomingMsg: 'कोई निर्धारित ऑर्डर नहीं मिला।',
+        reminderNone: 'अभी तक कोई रिमाइंडर नहीं भेजा गया',
+        sendReminder: 'रिमाइंडर भेजें',
+        reRemind: 'दोबारा रिमाइंड करें',
+        nextStage: 'अगला चरण',
+        settingsTitle: 'स्टिच लॉग दुकान और टेलर सेटिंग्स',
+        settingsShopName: 'दुकान का नाम',
+        settingsTailorName: 'मास्टर टेलर का नाम',
+        settingsLangLabel: 'अटेलियर भाषा (11 भाषाएं)',
+        saveShopBtn: 'दुकान प्रोफ़ाइल सहेजें',
+        printLedgerBtn: 'लेजर सारांश प्रिंट करें',
+        archiveTitle: 'आर्काइव और खाता नियंत्रण',
+        archiveDesc: 'सैंपल ग्राहक डेटा बहाल करें, या अपना टेलर खाता और सभी सहेजे गए रिकॉर्ड स्थायी रूप से हटाएं।',
+        restoreSampleBtn: 'सैंपल डेटा बहाल करें',
+        dangerZone: 'खतरनाक क्षेत्र',
+        deleteAccountBtn: 'टेलर खाता और सेटिंग्स हटाएं'
+      },
+      ta: {
+        login: 'உள்நுழைவு',
+        createAccount: 'கணக்கை உருவாக்கவும்',
+        welcomeBack: 'நல்வரவு, தலைமை தையல்காரர்',
+        loginDesc: 'உங்கள் ஸ்டிச் லாக் அளவுகள், ஆர்டர்கள் மற்றும் பொருத்தங்களைப் பார்க்க உள்நுழையவும்.',
+        enterAtelier: 'ஸ்டிச் லாக் திறக்கவும்',
+        demoAccount: 'மாதிரி கணக்கு',
+        tailorEmailLabel: 'தையல்காரர் மின்னஞ்சல் அல்லது பெயர்',
+        passcodeLabel: 'கடவுக்குறியீடு / கடவுச்சொல்',
+        createAccountTitle: 'தையல்காரர் கணக்கு உருவாக்கவும்',
+        createAccountDesc: 'உங்கள் ஸ்டிச் லாக் கடை விவரம் மற்றும் உள்நுழைவை அமைக்கவும்.',
+        shopNameLabel: 'கடை பெயர் *',
+        tailorNameLabel: 'தையல்காரர் பெயர் *',
+        emailIdLabel: 'மின்னஞ்சல் / உள்நுழைவு ஐடி *',
+        passwordLabel: 'கடவுச்சொல் *',
+        preferredLangLabel: 'விரும்பிய மொழி',
+        saveAccountBtn: 'கணக்கைச் சேமித்து ஸ்டிச் லாக் திறக்கவும்',
+        masterTailor: 'தலைமை தையல்காரர்',
+        logout: 'வெளியேறு',
+        navLedger: 'அளவுகள் & ஆர்டர்கள்',
+        navDeliveries: 'டெலிவரி & நினைவூட்டல்கள்',
+        navSettings: 'கடை அமைப்புகள்',
+        qaAddTitle: 'வாடிக்கையாளர் & ஆர்டர் சேர்',
+        qaAddSub: 'அளவு, துணி & தேதி சேமிக்கவும்',
+        qaDelivTitle: 'டெலிவரிகளைப் பார்க்கவும்',
+        qaDelivSub: 'தயார் மற்றும் தாமதமான ஆர்டர்களைச் சரிபார்க்கவும்',
+        qaFindTitle: 'வாடிக்கையாளரைத் தேடு',
+        qaFindSub: 'பெயர், எண் அல்லது ஆடையால் தேடவும்',
+        kpiFolios: 'வாடிக்கையாளர் பதிவுகள்',
+        kpiActive: 'செயலில் உள்ள ஆர்டர்கள்',
+        kpiOverdue: 'தாமத எச்சரிக்கைகள்',
+        kpiReady: 'டெலிவரிக்குத் தயார்',
+        ledgerLabel: 'பதிவேடு:',
+        allClients: 'அனைத்து வாடிக்கையாளர்கள்',
+        womensLedger: 'பெண்கள் பதிவேடு (அங்குலம்)',
+        mensLedger: 'ஆண்கள் பதிவேடு (அங்குலம்)',
+        searchPlaceholder: 'பெயர், எண், ஆடை தேடவும்...',
+        allStages: 'அனைத்து நிலைகள்',
+        stageMeasurement: 'அளவு எடுக்கப்பட்டது',
+        stageCutting: 'வெட்டுதல்',
+        stageFitting: 'முதல் பொருத்தம்',
+        stageStitching: 'தைத்தல்',
+        stageQualityCheck: 'தரப் பரிசோதனை',
+        stageReady: 'டெலிவரிக்குத் தயார்',
+        inchCmGuide: 'அங்குலம் / செ.மீ வழிகாட்டி',
+        newOrderBtn: 'புதிய வாடிக்கையாளர் & ஆர்டர்',
+        emptyTitle: 'பொருத்தமான வாடிக்கையாளர் பதிவு இல்லை',
+        emptyDesc: 'தேடலை மாற்றவும் அல்லது புதிய வாடிக்கையாளர் ஆர்டரைச் சேர்க்கவும்.',
+        overdueBadge: 'தாமதம்',
+        remindedBadge: 'நினைவூட்டப்பட்டது',
+        duePrefix: 'நாள்',
+        folioAndFit: 'பதிவேடு & பொருத்தம்',
+        stageBtn: 'நிலை',
+        delivTitle: 'டெலிவரி அட்டவணை & தாமத கண்காணிப்பு',
+        delivDesc: 'தாமதமான ஆடைகள், வரவிருக்கும் டெலிவரிகள் மற்றும் நினைவூட்டல்களை நிர்வகிக்கவும்.',
+        overduePill: 'தாமதம்:',
+        upcomingPill: 'வரவிருப்பவை:',
+        overdueHeading: 'தாமதமான டெலிவரிகள் (உடனடி கவனம் தேவை)',
+        upcomingHeading: 'திட்டமிடப்பட்ட & தயார் டெலிவரிகள்',
+        noOverdueMsg: 'தாமதமான ஆர்டர்கள் எதுவும் இல்லை.',
+        noUpcomingMsg: 'திட்டமிடப்பட்ட ஆர்டர்கள் எதுவும் இல்லை.',
+        reminderNone: 'இன்னும் நினைவூட்டல் அனுப்பப்படவில்லை',
+        sendReminder: 'நினைவூட்டல் அனுப்பு',
+        reRemind: 'மீண்டும் நினைவூட்டு',
+        nextStage: 'அடுத்த நிலை',
+        settingsTitle: 'ஸ்டிச் லாக் கடை & தையல்காரர் அமைப்புகள்',
+        settingsShopName: 'கடை பெயர்',
+        settingsTailorName: 'தலைமை தையல்காரர் பெயர்',
+        settingsLangLabel: 'அட்டெலியர் மொழி (11 மொழிகள்)',
+        saveShopBtn: 'கடை விவரத்தைச் சேமி',
+        printLedgerBtn: 'பதிவேடு சுருக்கம் அச்சிடு',
+        archiveTitle: 'காப்பகம் & கணக்கு கட்டுப்பாடுகள்',
+        archiveDesc: 'மாதிரி தரவை மீட்டெடுக்கவும் அல்லது உங்கள் கணக்கு மற்றும் தரவை நிரந்தரமாக நீக்கவும்.',
+        restoreSampleBtn: 'மாதிரி தரவை மீட்டெடு',
+        dangerZone: 'ஆபத்து பகுதி',
+        deleteAccountBtn: 'தையல்காரர் கணக்கு & அமைப்புகளை நீக்கு'
+      },
+      mr: {
+        login: 'अटेलियर लॉगिन',
+        createAccount: 'खाते तयार करा',
+        welcomeBack: 'स्वागत आहे, मास्टर टेलर',
+        loginDesc: 'तुमची स्टिच लॉग मापे, ऑर्डर्स आणि फिटिंग्ज पाहण्यासाठी साइन इन करा.',
+        enterAtelier: 'स्टिच लॉग उघडा',
+        demoAccount: 'डेमो खाते',
+        tailorEmailLabel: 'टेलर ईमेल किंवा नाव',
+        passcodeLabel: 'पासकोड / पासवर्ड',
+        createAccountTitle: 'टेलर खाते तयार करा',
+        createAccountDesc: 'तुमच्या स्टिच लॉग दुकानाची माहिती आणि मास्टर टेलर लॉगिन तयार करा.',
+        shopNameLabel: 'दुकानाचे नाव *',
+        tailorNameLabel: 'टेलरचे नाव *',
+        emailIdLabel: 'ईमेल / लॉगिन आयडी *',
+        passwordLabel: 'पासवर्ड *',
+        preferredLangLabel: 'पसंतीची भाषा',
+        saveAccountBtn: 'खाते जतन करा आणि स्टिच लॉग उघडा',
+        masterTailor: 'मास्टर टेलर',
+        logout: 'लॉग आउट',
+        navLedger: 'मापे आणि ऑर्डर्स',
+        navDeliveries: 'डिलिव्हरी आणि स्मरणपत्रे',
+        navSettings: 'दुकान सेटिंग्ज',
+        qaAddTitle: 'ग्राहक आणि ऑर्डर जोडा',
+        qaAddSub: 'मापे, कापड आणि तारीख जतन करा',
+        qaDelivTitle: 'डिलिव्हरी पहा',
+        qaDelivSub: 'तयार आणि उशीर झालेल्या ऑर्डर्स तपासा',
+        qaFindTitle: 'ग्राहक शोधा',
+        qaFindSub: 'नाव, फोन किंवा पोशाखावरून शोधा',
+        kpiFolios: 'ग्राहक नोंदी',
+        kpiActive: 'सक्रिय ऑर्डर्स',
+        kpiOverdue: 'उशीर सूचना',
+        kpiReady: 'डिलिव्हरीसाठी तयार',
+        ledgerLabel: 'खातेवही:',
+        allClients: 'सर्व ग्राहक',
+        womensLedger: 'महिला खातेवही (इंच)',
+        mensLedger: 'पुरुष खातेवही (इंच)',
+        searchPlaceholder: 'नाव, फोन, पोशाख शोधा...',
+        allStages: 'सर्व टप्पे',
+        stageMeasurement: 'माप घेतले',
+        stageCutting: 'कटिंग',
+        stageFitting: 'पहिली फिटिंग',
+        stageStitching: 'शिलाई',
+        stageQualityCheck: 'गुणवत्ता तपासणी',
+        stageReady: 'डिलिव्हरीसाठी तयार',
+        inchCmGuide: 'इंच / सेमी मार्गदर्शक',
+        newOrderBtn: 'नवीन ग्राहक आणि ऑर्डर',
+        emptyTitle: 'कोणतीही ग्राहक नोंद आढळली नाही',
+        emptyDesc: 'शोध फिल्टर बदला किंवा नवीन ग्राहक ऑर्डर जोडा.',
+        overdueBadge: 'उशीर झाला',
+        remindedBadge: 'स्मरणपत्र पाठवले',
+        duePrefix: 'देय',
+        folioAndFit: 'नोंद आणि फिट',
+        stageBtn: 'टप्पा',
+        delivTitle: 'डिलिव्हरी वेळापत्रक आणि उशीर पाहणी',
+        delivDesc: 'उशीर झालेले पोशाख, आगामी डिलिव्हरी आणि स्मरणपत्रे व्यवस्थापित करा.',
+        overduePill: 'उशीर:',
+        upcomingPill: 'आगामी:',
+        overdueHeading: 'उशीर झालेल्या डिलिव्हरी (त्वरित लक्ष द्या)',
+        upcomingHeading: 'नियोजित आणि तयार डिलिव्हरी',
+        noOverdueMsg: 'कोणत्याही ऑर्डरला उशीर झालेला नाही.',
+        noUpcomingMsg: 'कोणत्याही नियोजित ऑर्डर्स नाहीत.',
+        reminderNone: 'अजून स्मरणपत्र पाठवलेले नाही',
+        sendReminder: 'स्मरणपत्र पाठवा',
+        reRemind: 'पुन्हा आठवण करा',
+        nextStage: 'पुढील टप्पा',
+        settingsTitle: 'स्टिच लॉग दुकान आणि टेलर सेटिंग्ज',
+        settingsShopName: 'दुकानाचे नाव',
+        settingsTailorName: 'मास्टर टेलरचे नाव',
+        settingsLangLabel: 'अटेलियर भाषा (11 भाषा)',
+        saveShopBtn: 'दुकान प्रोफाइल जतन करा',
+        printLedgerBtn: 'खातेवही सारांश प्रिंट करा',
+        archiveTitle: 'आर्काइव आणि खाते नियंत्रणे',
+        archiveDesc: 'नमुना डेटा पुनर्संचयित करा किंवा तुमचे खाते आणि सर्व डेटा कायमचा हटवा.',
+        restoreSampleBtn: 'नमुना डेटा पुनर्संचयित करा',
+        dangerZone: 'धोका क्षेत्र',
+        deleteAccountBtn: 'टेलर खाते आणि सेटिंग्ज हटवा'
+      },
+      te: {
+        login: 'లాగిన్',
+        createAccount: 'ఖాతా సృష్టించండి',
+        welcomeBack: 'స్వాగతం, మాస్టర్ టైలర్',
+        loginDesc: 'మీ స్టిచ్ లాగ్ కొలతలు, ఆర్డర్‌లు మరియు ఫిట్టింగ్‌లను చూడటానికి సైన్ ఇన్ చేయండి.',
+        enterAtelier: 'స్టిచ్ లాగ్ తెరవండి',
+        demoAccount: 'డెమో ఖాతా',
+        tailorEmailLabel: 'టైలర్ ఇమెయిల్ లేదా పేరు',
+        passcodeLabel: 'పాస్‌కోడ్ / పాస్‌వర్డ్',
+        createAccountTitle: 'టైలర్ ఖాతా సృష్టించండి',
+        createAccountDesc: 'మీ స్టిచ్ లాగ్ దుకాణ వివరాలు మరియు లాగిన్ సెట్ చేయండి.',
+        shopNameLabel: 'దుకాణం పేరు *',
+        tailorNameLabel: 'టైలర్ పేరు *',
+        emailIdLabel: 'ఇమెయిల్ / లాగిన్ ఐడి *',
+        passwordLabel: 'పాస్‌వర్డ్ *',
+        preferredLangLabel: 'ఇష్టమైన భాష',
+        saveAccountBtn: 'ఖాతా సేవ్ చేసి స్టిచ్ లాగ్ తెరవండి',
+        masterTailor: 'మాస్టర్ టైలర్',
+        logout: 'లాగ్ అవుట్',
+        navLedger: 'కొలతలు & ఆర్డర్‌లు',
+        navDeliveries: 'డెలివరీలు & రిమైండర్‌లు',
+        navSettings: 'దుకాణ సెట్టింగ్‌లు',
+        qaAddTitle: 'కస్టమర్ & ఆర్డర్ చేర్చండి',
+        qaAddSub: 'కొలతలు, బట్ట & తేదీ సేవ్ చేయండి',
+        qaDelivTitle: 'డెలివరీలు చూడండి',
+        qaDelivSub: 'సిద్ధంగా ఉన్న మరియు ఆలస్యమైన ఆర్డర్‌లు చూడండి',
+        qaFindTitle: 'కస్టమర్‌ను కనుగొనండి',
+        qaFindSub: 'పేరు, ఫోన్ లేదా దుస్తులతో వెతకండి',
+        kpiFolios: 'కస్టమర్ రికార్డులు',
+        kpiActive: 'యాక్టివ్ ఆర్డర్‌లు',
+        kpiOverdue: 'ఆలస్య హెచ్చరికలు',
+        kpiReady: 'డెలివరీకి సిద్ధం',
+        ledgerLabel: 'లెడ్జర్:',
+        allClients: 'అందరు కస్టమర్‌లు',
+        womensLedger: 'మహిళల లెడ్జర్ (అంగుళాలు)',
+        mensLedger: 'పురుషుల లెడ్జర్ (అంగుళాలు)',
+        searchPlaceholder: 'పేరు, ఫోన్, దుస్తులు వెతకండి...',
+        allStages: 'అన్ని దశలు',
+        stageMeasurement: 'కొలత తీసుకున్నారు',
+        stageCutting: 'కటింగ్',
+        stageFitting: 'మొదటి ఫిట్టింగ్',
+        stageStitching: 'కుట్టడం',
+        stageQualityCheck: 'నాణ్యత తనిఖీ',
+        stageReady: 'డెలివరీకి సిద్ధం',
+        inchCmGuide: 'అంగుళం / సెం.మీ గైడ్',
+        newOrderBtn: 'కొత్త కస్టమర్ & ఆర్డర్',
+        emptyTitle: 'సరిపోయే కస్టమర్ రికార్డులు లేవు',
+        emptyDesc: 'సెర్చ్ క్లియర్ చేయండి లేదా కొత్త కస్టమర్ ఆర్డర్ చేర్చండి.',
+        overdueBadge: 'ఆలస్యం',
+        remindedBadge: 'రిమైండర్ పంపారు',
+        duePrefix: 'గడువు',
+        folioAndFit: 'ఫోలియో & ఫిట్',
+        stageBtn: 'దశ',
+        delivTitle: 'డెలివరీ షెడ్యూల్ & ఆలస్య పర్యవేక్షణ',
+        delivDesc: 'ఆలస్యమైన ఆర్డర్‌లు, రాబోయే డెలివరీలు మరియు రిమైండర్‌లను ట్రాక్ చేయండి.',
+        overduePill: 'ఆలస్యం:',
+        upcomingPill: 'రాబోయేవి:',
+        overdueHeading: 'ఆలస్యమైన డెలివరీలు (తక్షణ శ్రద్ధ అవసరం)',
+        upcomingHeading: 'షెడ్యూల్ చేసిన & సిద్ధమైన డెలివరీలు',
+        noOverdueMsg: 'ఆలస్యమైన ఆర్డర్‌లు ఏవీ లేవు.',
+        noUpcomingMsg: 'షెడ్యూల్ చేసిన ఆర్డర్‌లు లేవు.',
+        reminderNone: 'ఇంకా రిమైండర్ పంపలేదు',
+        sendReminder: 'రిమైండర్ పంపు',
+        reRemind: 'మళ్లీ రిమైండ్ చేయి',
+        nextStage: 'తదుపరి దశ',
+        settingsTitle: 'స్టిచ్ లాగ్ దుకాణం & టైలర్ సెట్టింగ్‌లు',
+        settingsShopName: 'దుకాణం పేరు',
+        settingsTailorName: 'మాస్టర్ టైలర్ పేరు',
+        settingsLangLabel: 'అటెలియర్ భాష (11 భాషలు)',
+        saveShopBtn: 'దుకాణ ప్రొఫైల్ సేవ్ చేయండి',
+        printLedgerBtn: 'లెడ్జర్ సారాంశం ప్రింట్ చేయండి',
+        archiveTitle: 'ఆర్కైవ్ & ఖాతా నియంత్రణలు',
+        archiveDesc: 'నమూనా డేటాను పునరుద్ధరించండి లేదా మీ ఖాతా మరియు డేటాను శాశ్వతంగా తొలగించండి.',
+        restoreSampleBtn: 'నమూనా డేటా పునరుద్ధరించండి',
+        dangerZone: 'ప్రమాద జోన్',
+        deleteAccountBtn: 'టైలర్ ఖాతా & సెట్టింగ్‌లు తొలగించండి'
+      },
+      kn: {
+        login: 'ಲಾಗಿನ್',
+        createAccount: 'ಖಾತೆ ರಚಿಸಿ',
+        welcomeBack: 'ಸ್ವಾಗತ, ಮಾಸ್ಟರ್ ಟೈಲರ್',
+        loginDesc: 'ನಿಮ್ಮ ಸ್ಟಿಚ್ ಲಾಗ್ ಅಳತೆಗಳು, ಆರ್ಡರ್‌ಗಳು ಮತ್ತು ಫಿಟ್ಟಿಂಗ್‌ಗಳನ್ನು ನೋಡಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.',
+        enterAtelier: 'ಸ್ಟಿಚ್ ಲಾಗ್ ತೆರೆಯಿರಿ',
+        demoAccount: 'ಡೆಮೊ ಖಾತೆ',
+        tailorEmailLabel: 'ಟೈಲರ್ ಇಮೇಲ್ ಅಥವಾ ಹೆಸರು',
+        passcodeLabel: 'ಪಾಸ್‌ಕೋಡ್ / ಪಾಸ್‌ವರ್ಡ್',
+        createAccountTitle: 'ಟೈಲರ್ ಖಾತೆ ರಚಿಸಿ',
+        createAccountDesc: 'ನಿಮ್ಮ ಸ್ಟಿಚ್ ಲಾಗ್ ಅಂಗಡಿ ವಿವರ ಮತ್ತು ಲಾಗಿನ್ ಹೊಂದಿಸಿ.',
+        shopNameLabel: 'ಅಂಗಡಿ ಹೆಸರು *',
+        tailorNameLabel: 'ಟೈಲರ್ ಹೆಸರು *',
+        emailIdLabel: 'ಇಮೇಲ್ / ಲಾಗಿನ್ ಐಡಿ *',
+        passwordLabel: 'ಪಾಸ್‌ವರ್ಡ್ *',
+        preferredLangLabel: 'ಆಯ್ಕೆಯ ಭಾಷೆ',
+        saveAccountBtn: 'ಖಾತೆ ಉಳಿಸಿ ಮತ್ತು ಸ್ಟಿಚ್ ಲಾಗ್ ತೆರೆಯಿರಿ',
+        masterTailor: 'ಮಾಸ್ಟರ್ ಟೈಲರ್',
+        logout: 'ಲಾಗ್ ಔಟ್',
+        navLedger: 'ಅಳತೆಗಳು ಮತ್ತು ಆರ್ಡರ್‌ಗಳು',
+        navDeliveries: 'ಡೆಲಿವರಿ ಮತ್ತು ಜ್ಞಾಪನೆಗಳು',
+        navSettings: 'ಅಂಗಡಿ ಸೆಟ್ಟಿಂಗ್‌ಗಳು',
+        qaAddTitle: 'ಗ್ರಾಹಕ ಮತ್ತು ಆರ್ಡರ್ ಸೇರಿಸಿ',
+        qaAddSub: 'ಅಳತೆ, ಬಟ್ಟೆ ಮತ್ತು ದಿನಾಂಕ ಉಳಿಸಿ',
+        qaDelivTitle: 'ಡೆಲಿವರಿಗಳನ್ನು ನೋಡಿ',
+        qaDelivSub: 'ಸಿದ್ಧ ಮತ್ತು ತಡವಾದ ಆರ್ಡರ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಿ',
+        qaFindTitle: 'ಗ್ರಾಹಕರನ್ನು ಹುಡುಕಿ',
+        qaFindSub: 'ಹೆಸರು, ಫೋನ್ ಅಥವಾ ಉಡುಪಿನಿಂದ ಹುಡುಕಿ',
+        kpiFolios: 'ಗ್ರಾಹಕ ದಾಖಲೆಗಳು',
+        kpiActive: 'ಸಕ್ರಿಯ ಆರ್ಡರ್‌ಗಳು',
+        kpiOverdue: 'ತಡವಾದ ಎಚ್ಚರಿಕೆಗಳು',
+        kpiReady: 'ಡೆಲಿವರಿಗೆ ಸಿದ್ಧ',
+        ledgerLabel: 'ಲೆಡ್ಜರ್:',
+        allClients: 'ಎಲ್ಲಾ ಗ್ರಾಹಕರು',
+        womensLedger: 'ಮಹಿಳೆಯರ ಲೆಡ್ಜರ್ (ಇಂಚು)',
+        mensLedger: 'ಪುರುಷರ ಲೆಡ್ಜರ್ (ಇಂಚು)',
+        searchPlaceholder: 'ಹೆಸರು, ಫೋನ್, ಉಡುಪು ಹುಡುಕಿ...',
+        allStages: 'ಎಲ್ಲಾ ಹಂತಗಳು',
+        stageMeasurement: 'ಅಳತೆ ತೆಗೆದುಕೊಳ್ಳಲಾಗಿದೆ',
+        stageCutting: 'ಕಟಿಂಗ್',
+        stageFitting: 'ಮೊದಲ ಫಿಟ್ಟಿಂಗ್',
+        stageStitching: 'ಹೊಲಿಗೆ',
+        stageQualityCheck: 'ಗುಣಮಟ್ಟ ಪರಿಶೀಲನೆ',
+        stageReady: 'ಡೆಲಿವರಿಗೆ ಸಿದ್ಧ',
+        inchCmGuide: 'ಇಂಚು / ಸೆಂ.ಮೀ ಮಾರ್ಗದರ್ಶಿ',
+        newOrderBtn: 'ಹೊಸ ಗ್ರಾಹಕ ಮತ್ತು ಆರ್ಡರ್',
+        emptyTitle: 'ಹೊಂದುವ ಗ್ರಾಹಕ ದಾಖಲೆಗಳಿಲ್ಲ',
+        emptyDesc: 'ಹುಡುಕಾಟವನ್ನು ತೆರವುಗೊಳಿಸಿ ಅಥವಾ ಹೊಸ ಗ್ರಾಹಕ ಆರ್ಡರ್ ಸೇರಿಸಿ.',
+        overdueBadge: 'ತಡವಾಗಿದೆ',
+        remindedBadge: 'ಜ್ಞಾಪನೆ ಕಳುಹಿಸಲಾಗಿದೆ',
+        duePrefix: 'ದಿನಾಂಕ',
+        folioAndFit: 'ದಾಖಲೆ ಮತ್ತು ಫಿಟ್',
+        stageBtn: 'ಹಂತ',
+        delivTitle: 'ಡೆಲಿವರಿ ವೇಳಾಪಟ್ಟಿ ಮತ್ತು ತಡ ಕಣ್ಗಾವಲು',
+        delivDesc: 'ತಡವಾದ ಉಡುಪುಗಳು, ಮುಂಬರುವ ಡೆಲಿವರಿಗಳು ಮತ್ತು ಜ್ಞಾಪನೆಗಳನ್ನು ನಿರ್ವಹಿಸಿ.',
+        overduePill: 'ತಡ:',
+        upcomingPill: 'ಮುಂಬರುವ:',
+        overdueHeading: 'ತಡವಾದ ಡೆಲಿವರಿಗಳು (ತಕ್ಷಣ ಗಮನ ಅಗತ್ಯ)',
+        upcomingHeading: 'ನಿಗದಿತ ಮತ್ತು ಸಿದ್ಧ ಡೆಲಿವರಿಗಳು',
+        noOverdueMsg: 'ಯಾವುದೇ ತಡವಾದ ಆರ್ಡರ್‌ಗಳಿಲ್ಲ.',
+        noUpcomingMsg: 'ಯಾವುದೇ ನಿಗದಿತ ಆರ್ಡರ್‌ಗಳಿಲ್ಲ.',
+        reminderNone: 'ಇನ್ನೂ ಜ್ಞಾಪನೆ ಕಳುಹಿಸಿಲ್ಲ',
+        sendReminder: 'ಜ್ಞಾಪನೆ ಕಳುಹಿಸಿ',
+        reRemind: 'ಮತ್ತೆ ನೆನಪಿಸಿ',
+        nextStage: 'ಮುಂದಿನ ಹಂತ',
+        settingsTitle: 'ಸ್ಟಿಚ್ ಲಾಗ್ ಅಂಗಡಿ ಮತ್ತು ಟೈಲರ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳು',
+        settingsShopName: 'ಅಂಗಡಿ ಹೆಸರು',
+        settingsTailorName: 'ಮಾಸ್ಟರ್ ಟೈಲರ್ ಹೆಸರು',
+        settingsLangLabel: 'ಅಟೆಲಿಯರ್ ಭಾಷೆ (11 ಭಾಷೆಗಳು)',
+        saveShopBtn: 'ಅಂಗಡಿ ಪ್ರೊಫೈಲ್ ಉಳಿಸಿ',
+        printLedgerBtn: 'ಲೆಡ್ಜರ್ ಸಾರಾಂಶ ಮುದ್ರಿಸಿ',
+        archiveTitle: 'ಆರ್ಕೈವ್ ಮತ್ತು ಖಾತೆ ನಿಯಂತ್ರಣಗಳು',
+        archiveDesc: 'ಮಾದರಿ ಡೇಟಾವನ್ನು ಮರುಸ್ಥಾಪಿಸಿ ಅಥವಾ ನಿಮ್ಮ ಖಾತೆ ಮತ್ತು ಡೇಟಾವನ್ನು ಶಾಶ್ವతంగా ಅಳಿಸಿ.',
+        restoreSampleBtn: 'ಮಾದರಿ ಡೇಟಾ ಮರುಸ್ಥಾಪಿಸಿ',
+        dangerZone: 'ಅಪಾಯ ವಲಯ',
+        deleteAccountBtn: 'ಟೈಲರ್ ಖಾತೆ ಮತ್ತು ಸೆಟ್ಟಿಂಗ್‌ಗಳು ಅಳಿಸಿ'
+      },
+      ml: {
+        login: 'ലോഗിൻ',
+        createAccount: 'അക്കൗണ്ട് സൃഷ്ടിക്കുക',
+        welcomeBack: 'സ്വാഗതം, മാസ്റ്റർ ടെയ്‌ലർ',
+        loginDesc: 'നിങ്ങളുടെ സ്റ്റിച്ച് ലോഗ് അളവുകളും ഓർഡറുകളും കാണാൻ സൈൻ ഇൻ ചെയ്യുക.',
+        enterAtelier: 'സ്റ്റിച്ച് ലോഗ് തുറക്കുക',
+        demoAccount: 'ഡെമോ അക്കൗണ്ട്',
+        tailorEmailLabel: 'ടെയ്‌ലർ ഇമെയിൽ അല്ലെങ്കിൽ പേര്',
+        passcodeLabel: 'പാസ്‌കോഡ് / പാസ്‌വേഡ്',
+        createAccountTitle: 'ടെയ്‌ലർ അക്കൗണ്ട് സൃഷ്ടിക്കുക',
+        createAccountDesc: 'നിങ്ങളുടെ സ്റ്റിച്ച് ലോഗ് കടയുടെ വിവരങ്ങളും ലോഗിനും സജ്ജമാക്കുക.',
+        shopNameLabel: 'കടയുടെ പേര് *',
+        tailorNameLabel: 'ടെയ്‌ലറുടെ പേര് *',
+        emailIdLabel: 'ഇമെയിൽ / ലോഗിൻ ഐഡി *',
+        passwordLabel: 'പാസ്‌വേഡ് *',
+        preferredLangLabel: 'ഇഷ്ടമുള്ള ഭാഷ',
+        saveAccountBtn: 'അക്കൗണ്ട് സേവ് ചെയ്ത് സ്റ്റിച്ച് ലോഗ് തുറക്കുക',
+        masterTailor: 'മാസ്റ്റർ ടെയ്‌ലർ',
+        logout: 'ലോഗ് ഔട്ട്',
+        navLedger: 'അളവുകളും ഓർഡറുകളും',
+        navDeliveries: 'ഡെലിവറികളും ഓർമ്മപ്പെടുത്തലുകളും',
+        navSettings: 'കട ക്രമീകരണങ്ങൾ',
+        qaAddTitle: 'ഉപഭോക്താവും ഓർഡറും ചേർക്കുക',
+        qaAddSub: 'അളവ്, തുണി, തീയതി സേവ് ചെയ്യുക',
+        qaDelivTitle: 'ഡെലിവറികൾ കാണുക',
+        qaDelivSub: 'തയ്യാറായതും വൈകിയതുമായ ഓർഡറുകൾ പരിശോധിക്കുക',
+        qaFindTitle: 'ഉപഭോക്താവിനെ തിരയുക',
+        qaFindSub: 'പേര്, ഫോൺ അല്ലെങ്കിൽ വസ്ത്രം കൊണ്ട് തിരയുക',
+        kpiFolios: 'ഉപഭോക്തൃ രേഖകൾ',
+        kpiActive: 'സജീവ ഓർഡറുകൾ',
+        kpiOverdue: 'വൈകിയ മുന്നറിയിപ്പുകൾ',
+        kpiReady: 'ഡെലിവറിക്ക് തയ്യാറാണ്',
+        ledgerLabel: 'ലെഡ്ജർ:',
+        allClients: 'എല്ലാ ഉപഭോക്താക്കളും',
+        womensLedger: 'വനിതാ ലെഡ്ജർ (ഇഞ്ച്)',
+        mensLedger: 'പുരുഷ ലെഡ്ജർ (ഇഞ്ച്)',
+        searchPlaceholder: 'പേര്, ഫോൺ, വസ്ത്രം തിരയുക...',
+        allStages: 'എല്ലാ ഘട്ടങ്ങളും',
+        stageMeasurement: 'അളവ് എടുത്തു',
+        stageCutting: 'കട്ടിംഗ്',
+        stageFitting: 'ആദ്യ ഫിറ്റിംഗ്',
+        stageStitching: 'തയ്യൽ',
+        stageQualityCheck: 'ഗുണനിലവാര പരിശോധന',
+        stageReady: 'ഡെലിവറിക്ക് തയ്യാറാണ്',
+        inchCmGuide: 'ഇഞ്ച് / സെ.മീ ഗൈഡ്',
+        newOrderBtn: 'പുതിയ ഉപഭോക്താവും ഓർഡറും',
+        emptyTitle: 'ചേരുന്ന ഉപഭോക്തൃ രേഖകളൊന്നുമില്ല',
+        emptyDesc: 'തിരയൽ മാറ്റുക അല്ലെങ്കിൽ പുതിയ ഉപഭോക്തൃ ഓർഡർ ചേർക്കുക.',
+        overdueBadge: 'വൈകി',
+        remindedBadge: 'ഓർമ്മപ്പെടുത്തി',
+        duePrefix: 'തീയതി',
+        folioAndFit: 'രേഖയും ഫിറ്റും',
+        stageBtn: 'ഘട്ടം',
+        delivTitle: 'ഡെലിവറി ഷെഡ്യൂൾ & വൈകിയ നിരീക്ഷണം',
+        delivDesc: 'വൈകിയ വസ്ത്രങ്ങൾ, വരാനിരിക്കുന്ന ഡെലിവറികൾ, ഓർമ്മപ്പെടുത്തലുകൾ എന്നിവ ട്രാക്ക് ചെയ്യുക.',
+        overduePill: 'വൈകി:',
+        upcomingPill: 'വരാനിരിക്കുന്നവ:',
+        overdueHeading: 'വൈകിയ ഡെലിവറികൾ (ഉടനടി ശ്രദ്ധ ആവശ്യമാണ്)',
+        upcomingHeading: 'നിശ്ചയിച്ചതും തയ്യാറായതുമായ ഡെലിവറികൾ',
+        noOverdueMsg: 'വൈകിയ ഓർഡറുകൾ ഒന്നുമില്ല.',
+        noUpcomingMsg: 'നിശ്ചയിച്ച ഓർഡറുകൾ ഒന്നുമില്ല.',
+        reminderNone: 'ഇതുവരെ ഓർമ്മപ്പെടുത്തൽ അയച്ചിട്ടില്ല',
+        sendReminder: 'ഓർമ്മപ്പെടുത്തൽ അയക്കുക',
+        reRemind: 'വീണ്ടും ഓർമ്മിപ്പിക്കുക',
+        nextStage: 'അടുത്ത ഘട്ടം',
+        settingsTitle: 'സ്റ്റിച്ച് ലോഗ് കട & ടെയ്‌ലർ ക്രമീകരണങ്ങൾ',
+        settingsShopName: 'കടയുടെ പേര്',
+        settingsTailorName: 'മാസ്റ്റർ ടെയ്‌ലറുടെ പേര്',
+        settingsLangLabel: 'അറ്റലിയർ ഭാഷ (11 ഭാഷകൾ)',
+        saveShopBtn: 'കട പ്രൊഫൈൽ സേവ് ചെയ്യുക',
+        printLedgerBtn: 'ലെഡ്ജർ സംഗ്രഹം പ്രിന്റ് ചെയ്യുക',
+        archiveTitle: 'ആർക്കൈവ് & അക്കൗണ്ട് നിയന്ത്രണങ്ങൾ',
+        archiveDesc: 'സാമ്പിൾ ഡാറ്റ പുനഃസ്ഥാപിക്കുക അല്ലെങ്കിൽ അക്കൗണ്ടും ഡാറ്റയും ശാശ്വതമായി ഇല്ലാതാക്കുക.',
+        restoreSampleBtn: 'സാമ്പിൾ ഡാറ്റ പുനഃസ്ഥാപിക്കുക',
+        dangerZone: 'അപകട മേഖല',
+        deleteAccountBtn: 'ടെയ്‌ലർ അക്കൗണ്ട് & ക്രമീകരണങ്ങൾ ഇല്ലാതാക്കുക'
+      },
+      pa: {
+        login: 'ਲੌਗਇਨ',
+        createAccount: 'ਖਾਤਾ ਬਣਾਓ',
+        welcomeBack: 'ਜੀ ਆਇਆਂ ਨੂੰ, ਮਾਸਟਰ ਟੇਲਰ',
+        loginDesc: 'ਆਪਣੇ ਸਟਿਚ ਲੌਗ ਨਾਪ, ਆਰਡਰ ਅਤੇ ਫਿਟਿੰਗ ਦੇਖਣ ਲਈ ਸਾਈਨ ਇਨ ਕਰੋ।',
+        enterAtelier: 'ਸਟਿਚ ਲੌਗ ਖੋਲ੍ਹੋ',
+        demoAccount: 'ਡੈਮੋ ਖਾਤਾ',
+        tailorEmailLabel: 'ਟੇਲਰ ਈਮੇਲ ਜਾਂ ਨਾਮ',
+        passcodeLabel: 'ਪਾਸਕੋਡ / ਪਾਸਵਰਡ',
+        createAccountTitle: 'ਟੇਲਰ ਖਾਤਾ ਬਣਾਓ',
+        createAccountDesc: 'ਆਪਣੀ ਸਟਿਚ ਲੌਗ ਦੁਕਾਨ ਦੀ ਪਛਾਣ ਅਤੇ ਮਾਸਟਰ ਟੇਲਰ ਲੌਗਇਨ ਬਣਾਓ।',
+        shopNameLabel: 'ਦੁਕਾਨ ਦਾ ਨਾਮ *',
+        tailorNameLabel: 'ਟੇਲਰ ਦਾ ਨਾਮ *',
+        emailIdLabel: 'ਈਮੇਲ / ਲੌਗਇਨ ਆਈਡੀ *',
+        passwordLabel: 'ਪਾਸਵਰਡ *',
+        preferredLangLabel: 'ਪਸੰਦੀਦਾ ਭਾਸ਼ਾ',
+        saveAccountBtn: 'ਖਾਤਾ ਸੇਵ ਕਰੋ ਅਤੇ ਸਟਿਚ ਲੌਗ ਖੋਲ੍ਹੋ',
+        masterTailor: 'ਮਾਸਟਰ ਟੇਲਰ',
+        logout: 'ਲੌਗ ਆਉਟ',
+        navLedger: 'ਨਾਪ ਅਤੇ ਆਰਡਰ',
+        navDeliveries: 'ਡਿਲੀਵਰੀ ਅਤੇ ਯਾਦ-ਪੱਤਰ',
+        navSettings: 'ਦੁਕਾਨ ਸੈਟਿੰਗਾਂ',
+        qaAddTitle: 'ਗਾਹਕ ਅਤੇ ਆਰਡਰ ਜੋੜੋ',
+        qaAddSub: 'ਨਾਪ, ਕੱਪੜਾ ਅਤੇ ਮਿਤੀ ਸੇਵ ਕਰੋ',
+        qaDelivTitle: 'ਡਿਲੀਵਰੀ ਦੇਖੋ',
+        qaDelivSub: 'ਤਿਆਰ ਅਤੇ ਲੇਟ ਆਰਡਰ ਜਾਂਚੋ',
+        qaFindTitle: 'ਗਾਹਕ ਲੱਭੋ',
+        qaFindSub: 'ਨਾਮ, ਫ਼ੋਨ ਜਾਂ ਕੱਪੜੇ ਨਾਲ ਖੋਜੋ',
+        kpiFolios: 'ਗਾਹਕ ਰਿਕਾਰਡ',
+        kpiActive: 'ਸਰਗਰਮ ਆਰਡਰ',
+        kpiOverdue: 'ਲੇਟ ਚੇਤਾਵਨੀਆਂ',
+        kpiReady: 'ਡਿਲੀਵਰੀ ਲਈ ਤਿਆਰ',
+        ledgerLabel: 'ਖਾਤਾ:',
+        allClients: 'ਸਾਰੇ ਗਾਹਕ',
+        womensLedger: 'ਔਰਤਾਂ ਦਾ ਖਾਤਾ (ਇੰਚ)',
+        mensLedger: 'ਮਰਦਾਂ ਦਾ ਖਾਤਾ (ਇੰਚ)',
+        searchPlaceholder: 'ਨਾਮ, ਫ਼ੋਨ, ਕੱਪੜਾ ਖੋਜੋ...',
+        allStages: 'ਸਾਰੇ ਪੜਾਅ',
+        stageMeasurement: 'ਨਾਪ ਲਿਆ ਗਿਆ',
+        stageCutting: 'ਕਟਿੰਗ',
+        stageFitting: 'ਪਹਿਲੀ ਫਿਟਿੰਗ',
+        stageStitching: 'ਸਿਲਾਈ',
+        stageQualityCheck: 'ਗੁਣਵੱਤਾ ਜਾਂਚ',
+        stageReady: 'ਡਿਲੀਵਰੀ ਲਈ ਤਿਆਰ',
+        inchCmGuide: 'ਇੰਚ / ਸੈ.ਮੀ ਗਾਈਡ',
+        newOrderBtn: 'ਨਵਾਂ ਗਾਹਕ ਅਤੇ ਆਰਡਰ',
+        emptyTitle: 'ਕੋਈ ਗਾਹਕ ਰਿਕਾਰਡ ਨਹੀਂ ਮਿਲਿਆ',
+        emptyDesc: 'ਖੋਜ ਫਿਲਟਰ ਸਾਫ਼ ਕਰੋ ਜਾਂ ਨਵਾਂ ਗਾਹਕ ਆਰਡਰ ਜੋੜੋ।',
+        overdueBadge: 'ਲੇਟ',
+        remindedBadge: 'ਯਾਦ ਕਰਵਾਇਆ',
+        duePrefix: 'ਮਿਤੀ',
+        folioAndFit: 'ਰਿਕਾਰਡ ਅਤੇ ਫਿਟ',
+        stageBtn: 'ਪੜਾਅ',
+        delivTitle: 'ਡਿਲੀਵਰੀ ਸਮਾਂ-ਸਾਰਣੀ ਅਤੇ ਦੇਰੀ ਨਿਗਰਾਨੀ',
+        delivDesc: 'ਲੇਟ ਕੱਪੜੇ, ਆਉਣ ਵਾਲੀਆਂ ਡਿਲੀਵਰੀਆਂ ਅਤੇ ਯਾਦ-ਪੱਤਰਾਂ ਦਾ ਰਿਕਾਰਡ ਰੱਖੋ।',
+        overduePill: 'ਲੇਟ:',
+        upcomingPill: 'ਆਉਣ ਵਾਲੇ:',
+        overdueHeading: 'ਲੇਟ ਡਿਲੀਵਰੀਆਂ (ਤੁਰੰਤ ਧਿਆਨ ਦਿਓ)',
+        upcomingHeading: 'ਨਿਰਧਾਰਤ ਅਤੇ ਤਿਆਰ ਡਿਲੀਵਰੀਆਂ',
+        noOverdueMsg: 'ਕੋਈ ਲੇਟ ਆਰਡਰ ਨਹੀਂ ਹੈ।',
+        noUpcomingMsg: 'ਕੋਈ ਨਿਰਧਾਰਤ ਆਰਡਰ ਨਹੀਂ ਮਿਲਿਆ।',
+        reminderNone: 'ਅਜੇ ਕੋਈ ਯਾਦ-ਪੱਤਰ ਨਹੀਂ ਭੇਜਿਆ ਗਿਆ',
+        sendReminder: 'ਯਾਦ-ਪੱਤਰ ਭੇਜੋ',
+        reRemind: 'ਦੁਬਾਰਾ ਯਾਦ ਕਰਵਾਓ',
+        nextStage: 'ਅਗਲਾ ਪੜਾਅ',
+        settingsTitle: 'ਸਟਿਚ ਲੌਗ ਦੁਕਾਨ ਅਤੇ ਟੇਲਰ ਸੈਟਿੰਗਾਂ',
+        settingsShopName: 'ਦੁਕਾਨ ਦਾ ਨਾਮ',
+        settingsTailorName: 'ਮਾਸਟਰ ਟੇਲਰ ਦਾ ਨਾਮ',
+        settingsLangLabel: 'ਅਟੇਲੀਅਰ ਭਾਸ਼ਾ (11 ਭਾਸ਼ਾਵਾਂ)',
+        saveShopBtn: 'ਦੁਕਾਨ ਪ੍ਰੋਫਾਈਲ ਸੇਵ ਕਰੋ',
+        printLedgerBtn: 'ਖਾਤਾ ਸਾਰ ਪ੍ਰਿੰਟ ਕਰੋ',
+        archiveTitle: 'ਆਰਕਾਈਵ ਅਤੇ ਖਾਤਾ ਕੰਟਰੋਲ',
+        archiveDesc: 'ਨਮੂਨਾ ਡਾਟਾ ਬਹਾਲ ਕਰੋ ਜਾਂ ਆਪਣਾ ਖਾਤਾ ਅਤੇ ਸਾਰਾ ਡਾਟਾ ਪੱਕੇ ਤੌਰ ’ਤੇ ਮਿਟਾਓ।',
+        restoreSampleBtn: 'ਨਮੂਨਾ ਡਾਟਾ ਬਹਾਲ ਕਰੋ',
+        dangerZone: 'ਖ਼ਤਰਾ ਜ਼ੋਨ',
+        deleteAccountBtn: 'ਟੇਲਰ ਖਾਤਾ ਅਤੇ ਸੈਟਿੰਗਾਂ ਮਿਟਾਓ'
+      },
+      bho: {
+        login: 'लॉगिन',
+        createAccount: 'खाता बनाईं',
+        welcomeBack: 'स्वागत बा, मास्टर टेलर',
+        loginDesc: 'आपन स्टिच लॉग नाप, ऑर्डर आ फिटिंग देखे खातिर साइन इन करीं।',
+        enterAtelier: 'स्टिच लॉग खोलीं',
+        demoAccount: 'डेमो खाता',
+        tailorEmailLabel: 'टेलर ईमेल या नाम',
+        passcodeLabel: 'पासकोड / पासवर्ड',
+        createAccountTitle: 'टेलर खाता बनाईं',
+        createAccountDesc: 'आपन स्टिच लॉग दुकान के पहचान आ लॉगिन सेट करीं।',
+        shopNameLabel: 'दुकान के नाम *',
+        tailorNameLabel: 'टेलर के नाम *',
+        emailIdLabel: 'ईमेल / लॉगिन आईडी *',
+        passwordLabel: 'पासवर्ड *',
+        preferredLangLabel: 'पसंदीदा भाषा',
+        saveAccountBtn: 'खाता सहेजीं आ स्टिच लॉग खोलीं',
+        masterTailor: 'मास्टर टेलर',
+        logout: 'लॉग आउट',
+        navLedger: 'नाप आ ऑर्डर',
+        navDeliveries: 'डिलीवरी आ रिमाइंडर',
+        navSettings: 'दुकान सेटिंग्स',
+        qaAddTitle: 'ग्राहक आ ऑर्डर जोड़ीं',
+        qaAddSub: 'नाप, कपड़ा आ तारीख सहेजीं',
+        qaDelivTitle: 'डिलीवरी देखीं',
+        qaDelivSub: 'तैयार आ देरी वाला ऑर्डर जांचीं',
+        qaFindTitle: 'ग्राहक खोजीं',
+        qaFindSub: 'नाम, फोन या कपड़ा से खोजीं',
+        kpiFolios: 'ग्राहक रिकॉर्ड',
+        kpiActive: 'चालू ऑर्डर',
+        kpiOverdue: 'देरी अलर्ट',
+        kpiReady: 'डिलीवरी खातिर तैयार',
+        ledgerLabel: 'खाता:',
+        allClients: 'सभ ग्राहक',
+        womensLedger: 'महिला खाता (इंच)',
+        mensLedger: 'पुरुष खाता (इंच)',
+        searchPlaceholder: 'नाम, फोन, कपड़ा खोजीं...',
+        allStages: 'सभ चरण',
+        stageMeasurement: 'नाप लिहल गइल',
+        stageCutting: 'कटिंग',
+        stageFitting: 'पहिल फिटिंग',
+        stageStitching: 'सिलाई',
+        stageQualityCheck: 'क्वालिटी जांच',
+        stageReady: 'डिलीवरी खातिर तैयार',
+        inchCmGuide: 'इंच / सेमी गाइड',
+        newOrderBtn: 'नया ग्राहक आ ऑर्डर',
+        emptyTitle: 'कवनो ग्राहक रिकॉर्ड ना मिलल',
+        emptyDesc: 'खोज फिल्टर हटाईं या नया ग्राहक ऑर्डर जोड़ीं।',
+        overdueBadge: 'देरी भइल',
+        remindedBadge: 'रिमाइंडर भेजल गइल',
+        duePrefix: 'तारीख',
+        folioAndFit: 'फोलियो आ फिट',
+        stageBtn: 'चरण',
+        delivTitle: 'डिलीवरी टाइमटेबल आ देरी निगरानी',
+        delivDesc: 'देरी वाला कपड़ा, आवे वाला डिलीवरी आ रिमाइंडर देखीं।',
+        overduePill: 'देरी:',
+        upcomingPill: 'आवे वाला:',
+        overdueHeading: 'देरी वाला डिलीवरी (तुरंत ध्यान दीं)',
+        upcomingHeading: 'तय आ तैयार डिलीवरी',
+        noOverdueMsg: 'कवनो ऑर्डर में देरी नइखे।',
+        noUpcomingMsg: 'कवनो तय ऑर्डर नइखे।',
+        reminderNone: 'अबही ले कवनो रिमाइंडर नइखे भेजल गइल',
+        sendReminder: 'रिमाइंडर भेजीं',
+        reRemind: 'फेर याद दिलाईं',
+        nextStage: 'अगिला चरण',
+        settingsTitle: 'स्टिच लॉग दुकान आ टेलर सेटिंग्स',
+        settingsShopName: 'दुकान के नाम',
+        settingsTailorName: 'मास्टर टेलर के नाम',
+        settingsLangLabel: 'अटेलियर भाषा (11 भाषा)',
+        saveShopBtn: 'दुकान प्रोफाइल सहेजीं',
+        printLedgerBtn: 'खाता सारांश प्रिंट करीं',
+        archiveTitle: 'आर्काइव आ खाता कंट्रोल',
+        archiveDesc: 'सैंपल डेटा वापस लाईं या आपन खाता आ डेटा हमेशा खातिर मेटा दीं।',
+        restoreSampleBtn: 'सैंपल डेटा वापस लाईं',
+        dangerZone: 'खतरा जोन',
+        deleteAccountBtn: 'टेलर खाता आ सेटिंग्स मेटा दीं'
+      },
+      or: {
+        login: 'ଲଗଇନ୍',
+        createAccount: 'ଆକାଉଣ୍ଟ ତିଆରି କରନ୍ତୁ',
+        welcomeBack: 'ସ୍ୱାଗତ, ମାଷ୍ଟର ଟେଲର',
+        loginDesc: 'ଆପଣଙ୍କ ଷ୍ଟିଚ୍ ଲଗ୍ ମାପ, ଅର୍ଡର ଏବଂ ଫିଟିଂ ଦେଖିବା ପାଇଁ ସାଇନ୍ ଇନ୍ କରନ୍ତୁ।',
+        enterAtelier: 'ଷ୍ଟିଚ୍ ଲଗ୍ ଖୋଲନ୍ତୁ',
+        demoAccount: 'ଡେମୋ ଆକାଉଣ୍ଟ',
+        tailorEmailLabel: 'ଟେଲର ଇମେଲ୍ କିମ୍ବା ନାମ',
+        passcodeLabel: 'ପାସକୋଡ୍ / ପାସୱାର୍ଡ୍',
+        createAccountTitle: 'ଟେଲର ଆକାଉଣ୍ଟ ତିଆରି କରନ୍ତୁ',
+        createAccountDesc: 'ଆପଣଙ୍କ ଷ୍ଟିଚ୍ ଲଗ୍ ଦୋକାନ ପରିଚୟ ଏବଂ ଲଗଇନ୍ ସେଟ୍ କରନ୍ତୁ।',
+        shopNameLabel: 'ଦୋକାନ ନାମ *',
+        tailorNameLabel: 'ଟେଲର ନାମ *',
+        emailIdLabel: 'ଇମେଲ୍ / ଲଗଇନ୍ ଆଇଡି *',
+        passwordLabel: 'ପାସୱାର୍ଡ୍ *',
+        preferredLangLabel: 'ପସନ୍ଦର ଭାଷା',
+        saveAccountBtn: 'ଆକାଉଣ୍ଟ ସେଭ୍ କରି ଷ୍ଟିଚ୍ ଲଗ୍ ଖୋଲନ୍ତୁ',
+        masterTailor: 'ମାଷ୍ଟର ଟେଲର',
+        logout: 'ଲଗ୍ ଆଉଟ୍',
+        navLedger: 'ମାପ ଏବଂ ଅର୍ଡର',
+        navDeliveries: 'ଡେଲିଭରି ଏବଂ ରିମାଇଣ୍ଡର',
+        navSettings: 'ଦୋକାନ ସେଟିଂସ୍',
+        qaAddTitle: 'ଗ୍ରାହକ ଏବଂ ଅର୍ଡର ଯୋଡ଼ନ୍ତୁ',
+        qaAddSub: 'ମାପ, କପଡ଼ା ଏବଂ ତାରିଖ ସେଭ୍ କରନ୍ତୁ',
+        qaDelivTitle: 'ଡେଲିଭରି ଦେଖନ୍ତୁ',
+        qaDelivSub: 'ପ୍ରସ୍ତୁତ ଏବଂ ବିଳମ୍ବିତ ଅର୍ଡର ଯାଞ୍ଚ କରନ୍ତୁ',
+        qaFindTitle: 'ଗ୍ରାହକ ଖୋଜନ୍ତୁ',
+        qaFindSub: 'ନାମ, ଫୋନ୍ କିମ୍ବା ପୋଷାକ ଦ୍ୱାରା ଖୋଜନ୍ତୁ',
+        kpiFolios: 'ଗ୍ରାହକ ରେକର୍ଡ',
+        kpiActive: 'ସକ୍ରିୟ ଅର୍ଡର',
+        kpiOverdue: 'ବିଳମ୍ବ ସତର୍କତା',
+        kpiReady: 'ଡେଲିଭରି ପାଇଁ ପ୍ରସ୍ତୁତ',
+        ledgerLabel: 'ଲେଜର:',
+        allClients: 'ସମସ୍ତ ଗ୍ରାହକ',
+        womensLedger: 'ମହିଳା ଲେଜର (ଇଞ୍ଚ)',
+        mensLedger: 'ପୁରୁଷ ଲେଜର (ଇଞ୍ଚ)',
+        searchPlaceholder: 'ନାମ, ଫୋନ୍, ପୋଷାକ ଖୋଜନ୍ତୁ...',
+        allStages: 'ସମସ୍ତ ପର୍ଯ୍ୟାୟ',
+        stageMeasurement: 'ମାପ ନିଆଯାଇଛି',
+        stageCutting: 'କଟିଂ',
+        stageFitting: 'ପ୍ରଥମ ଫିଟିଂ',
+        stageStitching: 'ସିଲେଇ',
+        stageQualityCheck: 'ଗୁଣବତ୍ତା ଯାଞ୍ଚ',
+        stageReady: 'ଡେଲିଭରି ପାଇଁ ପ୍ରସ୍ତୁତ',
+        inchCmGuide: 'ଇଞ୍ଚ / ସେ.ମି ଗାଇଡ୍',
+        newOrderBtn: 'ନୂଆ ଗ୍ରାହକ ଏବଂ ଅର୍ଡର',
+        emptyTitle: 'କୌଣସି ଗ୍ରାହକ ରେକର୍ଡ ମିଳିଲା ନାହିଁ',
+        emptyDesc: 'ସର୍ଚ୍ଚ ଫିଲ୍ଟର ସଫା କରନ୍ତୁ କିମ୍ବା ନୂଆ ଗ୍ରାହକ ଅର୍ଡର ଯୋଡ଼ନ୍ତୁ।',
+        overdueBadge: 'ବିଳମ୍ବ',
+        remindedBadge: 'ରିମାଇଣ୍ଡର ପଠାଯାଇଛି',
+        duePrefix: 'ତାରିଖ',
+        folioAndFit: 'ଫୋଲିଓ ଏବଂ ଫିଟ୍',
+        stageBtn: 'ପର୍ଯ୍ୟାୟ',
+        delivTitle: 'ଡେଲିଭରି ସମୟସୂଚୀ ଏବଂ ବିଳମ୍ବ ନଜର',
+        delivDesc: 'ବିଳମ୍ବିତ ପୋଷାକ, ଆଗାମୀ ଡେଲିଭରି ଏବଂ ରିମାଇଣ୍ଡର ଟ୍ରାକ୍ କରନ୍ତୁ।',
+        overduePill: 'ବିଳମ୍ବ:',
+        upcomingPill: 'ଆଗାମୀ:',
+        overdueHeading: 'ବିଳମ୍ବିତ ଡେଲିଭରି (ତୁରନ୍ତ ଧ୍ୟାନ ଦିଅନ୍ତୁ)',
+        upcomingHeading: 'ନିର୍ଦ୍ଧାରିତ ଏବଂ ପ୍ରସ୍ତୁତ ଡେଲିଭରି',
+        noOverdueMsg: 'କୌଣସି ବିଳମ୍ବିତ ଅର୍ଡର ନାହିଁ।',
+        noUpcomingMsg: 'କୌଣସି ନିର୍ଦ୍ଧାରିତ ଅର୍ଡର ନାହିଁ।',
+        reminderNone: 'ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ରିମାଇଣ୍ଡର ପଠାଯାଇ ନାହିଁ',
+        sendReminder: 'ରିମାଇଣ୍ଡର ପଠାନ୍ତୁ',
+        reRemind: 'ପୁଣି ମନେ ପକାନ୍ତୁ',
+        nextStage: 'ପରବର୍ତ୍ତୀ ପର୍ଯ୍ୟାୟ',
+        settingsTitle: 'ଷ୍ଟିଚ୍ ଲଗ୍ ଦୋକାନ ଏବଂ ଟେଲର ସେଟିଂସ୍',
+        settingsShopName: 'ଦୋକାନ ନାମ',
+        settingsTailorName: 'ମାଷ୍ଟର ଟେଲର ନାମ',
+        settingsLangLabel: 'ଆଟେଲିୟର ଭାଷା (11 ଭାଷା)',
+        saveShopBtn: 'ଦୋକାନ ପ୍ରୋଫାଇଲ୍ ସେଭ୍ କରନ୍ତୁ',
+        printLedgerBtn: 'ଲେଜର ସାରାଂଶ ପ୍ରିଣ୍ଟ କରନ୍ତୁ',
+        archiveTitle: 'ଆର୍କାଇଭ୍ ଏବଂ ଆକାଉଣ୍ଟ ନିୟନ୍ତ୍ରଣ',
+        archiveDesc: 'ନମୁନା ଡାଟା ପୁନରୁଦ୍ଧାର କରନ୍ତୁ କିମ୍ବା ଆକାଉଣ୍ଟ ଏବଂ ଡାଟା ସ୍ଥାୟୀ ଭାବେ ଲିଭାନ୍ତୁ।',
+        restoreSampleBtn: 'ନମୁନା ଡାଟା ପୁନରୁଦ୍ଧାର କରନ୍ତୁ',
+        dangerZone: 'ବିପଦ ଜୋନ୍',
+        deleteAccountBtn: 'ଟେଲର ଆକାଉଣ୍ଟ ଏବଂ ସେଟିଂସ୍ ଲିଭାନ୍ତୁ'
+      },
+      bn: {
+        login: 'লগইন',
+        createAccount: 'অ্যাকাউন্ট তৈরি করুন',
+        welcomeBack: 'স্বাগতম, মাস্টার টেইলর',
+        loginDesc: 'আপনার স্টিচ লগ মাপ, অর্ডার এবং ফিটিং দেখতে সাইন ইন করুন।',
+        enterAtelier: 'স্টিচ লগ খুলুন',
+        demoAccount: 'ডেমো অ্যাকাউন্ট',
+        tailorEmailLabel: 'টেইলর ইমেইল বা নাম',
+        passcodeLabel: 'পাসকোড / পাসওয়ার্ড',
+        createAccountTitle: 'টেইলর অ্যাকাউন্ট তৈরি করুন',
+        createAccountDesc: 'আপনার স্টিচ লগ দোকানের পরিচয় এবং লগইন সেট করুন।',
+        shopNameLabel: 'দোকানের নাম *',
+        tailorNameLabel: 'টেইলরের নাম *',
+        emailIdLabel: 'ইমেইল / লগইন আইডি *',
+        passwordLabel: 'পাসওয়ার্ড *',
+        preferredLangLabel: 'পছন্দের ভাষা',
+        saveAccountBtn: 'অ্যাকাউন্ট সেভ করে স্টিচ লগ খুলুন',
+        masterTailor: 'মাস্টার টেইলর',
+        logout: 'লগ আউট',
+        navLedger: 'মাপ ও অর্ডার',
+        navDeliveries: 'ডেলিভারি ও রিমাইন্ডার',
+        navSettings: 'দোকান সেটিংস',
+        qaAddTitle: 'গ্রাহক ও অর্ডার যোগ করুন',
+        qaAddSub: 'মাপ, কাপড় ও তারিখ সেভ করুন',
+        qaDelivTitle: 'ডেলিভারি দেখুন',
+        qaDelivSub: 'প্রস্তুত ও বিলম্বিত অর্ডার দেখুন',
+        qaFindTitle: 'গ্রাহক খুঁজুন',
+        qaFindSub: 'নাম, ফোন বা পোশাক দিয়ে খুঁজুন',
+        kpiFolios: 'গ্রাহক রেকর্ড',
+        kpiActive: 'সক্রিয় অর্ডার',
+        kpiOverdue: 'বিলম্ব সতর্কতা',
+        kpiReady: 'ডেলিভারির জন্য প্রস্তুত',
+        ledgerLabel: 'লেজার:',
+        allClients: 'সব গ্রাহক',
+        womensLedger: 'মহিলা লেজার (ইঞ্চি)',
+        mensLedger: 'পুরুষ লেজার (ইঞ্চি)',
+        searchPlaceholder: 'নাম, ফোন, পোশাক খুঁজুন...',
+        allStages: 'সব ধাপ',
+        stageMeasurement: 'মাপ নেওয়া হয়েছে',
+        stageCutting: 'কাটিং',
+        stageFitting: 'প্রথম ফিটিং',
+        stageStitching: 'সেলাই',
+        stageQualityCheck: 'মান যাচাই',
+        stageReady: 'ডেলিভারির জন্য প্রস্তুত',
+        inchCmGuide: 'ইঞ্চি / সে.মি গাইড',
+        newOrderBtn: 'নতুন গ্রাহক ও অর্ডার',
+        emptyTitle: 'কোনো গ্রাহক রেকর্ড মেলেনি',
+        emptyDesc: 'সার্চ ফিল্টার মুছুন বা নতুন গ্রাহক অর্ডার যোগ করুন।',
+        overdueBadge: 'বিলম্বিত',
+        remindedBadge: 'রিমাইন্ডার পাঠানো হয়েছে',
+        duePrefix: 'তারিখ',
+        folioAndFit: 'ফোলিও ও ফিট',
+        stageBtn: 'ধাপ',
+        delivTitle: 'ডেলিভারি সময়সূচি ও বিলম্ব পর্যবেক্ষণ',
+        delivDesc: 'বিলম্বিত পোশাক, আসন্ন ডেলিভারি এবং রিমাইন্ডার ট্র্যাক করুন।',
+        overduePill: 'বিলম্বিত:',
+        upcomingPill: 'আসন্ন:',
+        overdueHeading: 'বিলম্বিত ডেলিভারি (জরুরি মনোযোগ প্রয়োজন)',
+        upcomingHeading: 'নির্ধারিত ও প্রস্তুত ডেলিভারি',
+        noOverdueMsg: 'কোনো বিলম্বিত অর্ডার নেই।',
+        noUpcomingMsg: 'কোনো নির্ধারিত অর্ডার নেই।',
+        reminderNone: 'এখনও কোনো রিমাইন্ডার পাঠানো হয়নি',
+        sendReminder: 'রিমাইন্ডার পাঠান',
+        reRemind: 'আবার মনে করান',
+        nextStage: 'পরবর্তী ধাপ',
+        settingsTitle: 'স্টিচ লগ দোকান ও টেইলর সেটিংস',
+        settingsShopName: 'দোকানের নাম',
+        settingsTailorName: 'মাস্টার টেইলরের নাম',
+        settingsLangLabel: 'অ্যাটেলিয়ার ভাষা (11টি ভাষা)',
+        saveShopBtn: 'দোকান প্রোফাইল সেভ করুন',
+        printLedgerBtn: 'লেজার সারসংক্ষেপ প্রিন্ট করুন',
+        archiveTitle: 'আর্কাইভ ও অ্যাকাউন্ট নিয়ন্ত্রণ',
+        archiveDesc: 'নমুনা ডেটা পুনরুদ্ধার করুন অথবা অ্যাকাউন্ট ও ডেটা স্থায়ীভাবে মুছুন।',
+        restoreSampleBtn: 'নমুনা ডেটা পুনরুদ্ধার করুন',
+        dangerZone: 'বিপদ জোন',
+        deleteAccountBtn: 'টেইলর অ্যাকাউন্ট ও সেটিংস মুছুন'
+      }
+    };
+
+    const I18N = Object.fromEntries(
+      LANGUAGES.map((lang) => [
+        lang.code,
+        {
+          ...BASE_UI_STRINGS,
+          ...(TRANSLATED_OVERRIDES[lang.code] || {})
+        }
+      ])
+    );
+
+    function t(key) {
+      const dict = I18N[atelier.language] || I18N.en;
+      return dict[key] || BASE_UI_STRINGS[key] || key;
+    }
+
+    function translateStageLabel(stage) {
+      const i18nKey = STAGE_I18N_KEYS[stage];
+      return i18nKey ? t(i18nKey) : stage;
+    }
+
+    const SAMPLE_IMAGES = {
+      roseSilk: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#F7E3EA"/><stop offset="100%" stop-color="#D47A96"/></linearGradient></defs><rect width="400" height="240" fill="url(#g)"/><path d="M0 40 Q200 10 400 40 M0 90 Q200 60 400 90 M0 140 Q200 110 400 140 M0 190 Q200 160 400 190" stroke="#FBF8F3" stroke-opacity="0.45" fill="none" stroke-width="2"/><text x="20" y="218" fill="#182C25" font-family="Georgia, serif" font-size="16" font-style="italic">Blush Rose Mulberry Silk</text></svg>'),
+      ivoryLinen: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240"><rect width="400" height="240" fill="#F3EEE5"/><pattern id="p" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 6 L12 6 M6 0 L6 12" stroke="#B69252" stroke-opacity="0.3" stroke-width="0.8"/></pattern><rect width="400" height="240" fill="url(#p)"/><text x="20" y="218" fill="#2A221D" font-family="Georgia,serif" font-size="16" font-style="italic">Heritage Ivory Linen</text></svg>'),
+      forestVelvet: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240"><rect width="400" height="240" fill="#182C25"/><circle cx="200" cy="110" r="65" fill="none" stroke="#B69252" stroke-opacity="0.55" stroke-width="1.5"/><text x="20" y="218" fill="#DFC58E" font-family="Georgia, serif" font-size="16" font-style="italic">Forest Velvet Gold Weave</text></svg>'),
+      coutureSketch: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240"><rect width="400" height="240" fill="#FBF8F3"/><path d="M200 35 C170 35 155 60 150 85 L120 140 L145 150 L162 105 L162 205 L238 205 L238 105 L255 150 L280 140 L250 85 C245 60 230 35 200 35 Z" fill="#F7E3EA" stroke="#182C25" stroke-width="2"/><text x="20" y="224" fill="#B25A76" font-family="Georgia,serif" font-size="15" font-style="italic">Ref. Sketch: Tailored Silhouette</text></svg>'),
+      embroideryMotif: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="240"><rect width="400" height="240" fill="#FDF5F8"/><circle cx="200" cy="115" r="46" fill="#D47A96" fill-opacity="0.35" stroke="#B25A76" stroke-width="2"/><path d="M200 69 C215 95 215 135 200 161 C185 135 185 95 200 69 Z" fill="#D47A96" stroke="#182C25" stroke-width="1.2"/><text x="20" y="224" fill="#182C25" font-family="Georgia,serif" font-size="15" font-style="italic">Ref. Design: Rose Rosette Weave</text></svg>')
+    };
+
+    function todayISO() {
+      return new Date().toISOString().split('T')[0];
+    }
+
+    function getDefaultAtelierState() {
+      const today = new Date();
+      const pastDate = new Date(today);
+      pastDate.setDate(today.getDate() - 3);
+      const pastHistoryDate = new Date(today);
+      pastHistoryDate.setDate(today.getDate() - 45);
+      const weekAgoDate = new Date(today);
+      weekAgoDate.setDate(today.getDate() - 7);
+      const futureDate = new Date(today);
+      futureDate.setDate(today.getDate() + 6);
+
+      const fmt = (d) => d.toISOString().split('T')[0];
+
+      return {
+        isAuthenticated: false,
+        language: 'en',
+        account: {
+          boutiqueName: 'Stitch Log',
+          tailorName: 'Aarav Kulkarni',
+          email: 'aarav@atelier.in',
+          password: 'couture1890'
+        },
+        genderLedger: 'All',
+        orders: [
+          {
+            id: 'ord-101',
+            customerName: 'Meera Iyer',
+            phone: '+91 98401 44210',
+            gender: 'Women',
+            garmentType: 'Bridal Silk Blouse',
+            deliveryDate: fmt(pastDate),
+            stage: 'First Fitting',
+            designName: 'Sweetheart Neck with Blush Rosette',
+            fabricPhoto: SAMPLE_IMAGES.roseSilk,
+            designPhoto: SAMPLE_IMAGES.embroideryMotif,
+            photoEntries: [
+              {
+                id: 'pe-101-1',
+                dateGiven: fmt(weekAgoDate),
+                note: 'Initial bridal silk swatch & sweetheart motif reference',
+                fabricPhotos: [SAMPLE_IMAGES.roseSilk],
+                designPhotos: [SAMPLE_IMAGES.embroideryMotif]
+              },
+              {
+                id: 'pe-101-2',
+                dateGiven: fmt(today),
+                note: 'Follow-up visit (1 week later): Ivory linen lining & back sketch',
+                fabricPhotos: [SAMPLE_IMAGES.ivoryLinen],
+                designPhotos: [SAMPLE_IMAGES.coutureSketch]
+              }
+            ],
+            notes: 'Keep 1.25" seam margin at side seams for festive weight flexibility.',
+            stylePreferences: {
+              fit: 'Slim / Tailored',
+              neckOrCollar: 'Sweetheart front, keyhole back',
+              comfortNotes: 'Soft cotton mulmul lining, padded cups'
+            },
+            measurements: {
+              bust: 35.5,
+              underbust: 30.0,
+              waist: 28.5,
+              hip: 38.0,
+              shoulder: 14.5,
+              sleeveLength: 11.0,
+              garmentLength: 15.0,
+              neckDepth: 8.5
+            },
+            previousMeasurements: {
+              bust: 35.0,
+              underbust: 30.0,
+              waist: 28.0,
+              hip: 38.0,
+              shoulder: 14.5,
+              sleeveLength: 10.5,
+              garmentLength: 15.0,
+              neckDepth: 8.0
+            },
+            orderHistory: [
+              {
+                id: 'hist-101a',
+                garmentType: 'Festive Brocade Blouse',
+                date: fmt(pastHistoryDate),
+                stage: 'Ready for Delivery',
+                summary: 'Bust 35.0" · Waist 28.0" · Hip 38.0" · Shoulder 14.5"'
+              }
+            ],
+            checklist: { qc1: true, qc2: true, qc3: false, qc4: false, qc5: true, qc6: false },
+            fittings: [
+              { id: 'f1', round: 'Fitting #1 (Basting)', date: fmt(pastDate), notes: 'Bust +0.5" eased; sleeve cap smoothed.', status: 'Alteration Logged' }
+            ],
+            reminderSent: false,
+            reminderLog: ''
+          },
+          {
+            id: 'ord-102',
+            customerName: 'Vikramaditya Rao',
+            phone: '+91 98201 77890',
+            gender: 'Men',
+            garmentType: 'Bespoke Bandhgala Jacket',
+            deliveryDate: fmt(futureDate),
+            stage: 'Stitching',
+            designName: 'Structured Collar & Antique Brass Buttons',
+            fabricPhoto: SAMPLE_IMAGES.forestVelvet,
+            designPhoto: SAMPLE_IMAGES.coutureSketch,
+            photoEntries: [
+              {
+                id: 'pe-102-1',
+                dateGiven: fmt(weekAgoDate),
+                note: 'Forest velvet suiting fabric & tailored jacket sketch',
+                fabricPhotos: [SAMPLE_IMAGES.forestVelvet],
+                designPhotos: [SAMPLE_IMAGES.coutureSketch]
+              }
+            ],
+            notes: 'Chest canvas floating construction; double welt breast pocket.',
+            stylePreferences: {
+              fit: 'Classic / Balanced Ease',
+              neckOrCollar: '1.5" structured bandhgala collar',
+              comfortNotes: 'Breathable Bemberg cupro lining'
+            },
+            measurements: {
+              chest: 41.0,
+              waist: 35.5,
+              shoulder: 18.0,
+              sleeveLength: 25.0,
+              shirtKurtaLength: 29.0,
+              collar: 16.0,
+              inseam: 30.5
+            },
+            previousMeasurements: {
+              chest: 40.5,
+              waist: 35.5,
+              shoulder: 18.0,
+              sleeveLength: 25.0,
+              shirtKurtaLength: 29.0,
+              collar: 16.0,
+              inseam: 30.5
+            },
+            orderHistory: [
+              {
+                id: 'hist-102a',
+                garmentType: 'Evening Silk Kurta',
+                date: fmt(pastHistoryDate),
+                stage: 'Ready for Delivery',
+                summary: 'Chest 40.5" · Waist 35.5" · Shoulder 18.0" · Collar 16.0"'
+              }
+            ],
+            checklist: { qc1: true, qc2: true, qc3: true, qc4: true, qc5: false, qc6: false },
+            fittings: [
+              { id: 'f2', round: 'Fitting #1 (Forward)', date: fmt(today), notes: 'Collar height ideal; cuffs crisp.', status: 'Approved Fit' }
+            ],
+            reminderSent: true,
+            reminderLog: `Sent on ${fmt(today)}`
+          },
+          {
+            id: 'ord-103',
+            customerName: 'Kavya Nair',
+            phone: '+91 97400 55129',
+            gender: 'Women',
+            garmentType: 'Heirloom Linen Kurti',
+            deliveryDate: fmt(futureDate),
+            stage: 'Ready for Delivery',
+            designName: 'Straight Cut with Blush Piping',
+            fabricPhoto: SAMPLE_IMAGES.ivoryLinen,
+            designPhoto: SAMPLE_IMAGES.coutureSketch,
+            photoEntries: [
+              {
+                id: 'pe-103-1',
+                dateGiven: fmt(weekAgoDate),
+                note: 'Belgian flax ivory linen & straight kurti reference',
+                fabricPhotos: [SAMPLE_IMAGES.ivoryLinen],
+                designPhotos: [SAMPLE_IMAGES.coutureSketch]
+              }
+            ],
+            notes: 'Pre-washed linen to prevent shrinkage.',
+            stylePreferences: {
+              fit: 'Relaxed / Airy',
+              neckOrCollar: 'Mandarin slit with blush piping',
+              comfortNotes: 'Unlined breathable weave'
+            },
+            measurements: {
+              bust: 37.0,
+              underbust: 31.5,
+              waist: 31.0,
+              hip: 40.0,
+              shoulder: 15.0,
+              sleeveLength: 17.5,
+              garmentLength: 42.0,
+              neckDepth: 7.0
+            },
+            previousMeasurements: {
+              bust: 37.0,
+              underbust: 31.5,
+              waist: 31.0,
+              hip: 40.0,
+              shoulder: 15.0,
+              sleeveLength: 17.5,
+              garmentLength: 42.0,
+              neckDepth: 7.0
+            },
+            orderHistory: [],
+            checklist: { qc1: true, qc2: true, qc3: true, qc4: true, qc5: true, qc6: true },
+            fittings: [
+              { id: 'f3', round: 'Final Trial', date: fmt(today), notes: 'Client delighted with drape and finish.', status: 'Ready for Handover' }
+            ],
+            reminderSent: false,
+            reminderLog: ''
+          }
+        ]
+      };
+    }
+
+    function getActiveLogoSrc() {
+      return atelier.logoData || '';
+    }
+
+    function syncLogos() {
+      // Logo elements removed per Stitch Log brand preferences; keep clean cursive Stitch Log text.
+    }
+
+    function normalizeOrderPhotoEntries(order) {
+      if (Array.isArray(order.photoEntries) && order.photoEntries.length > 0) {
+        return order.photoEntries;
+      }
+      const entries = [];
+      if (order.fabricPhoto || order.designPhoto) {
+        entries.push({
+          id: 'pe-' + (order.id || Date.now()),
+          dateGiven: order.deliveryDate || todayISO(),
+          note: order.designName || 'Initial Fabric & Reference',
+          fabricPhotos: order.fabricPhoto ? [order.fabricPhoto] : [],
+          designPhotos: order.designPhoto ? [order.designPhoto] : []
+        });
+      }
+      return entries;
+    }
+
+    let atelier = loadAtelierState();
+    let pendingConfirmFn = null;
+    let modalStagedPhotoEntries = [];
+    let pendingFabricUploads = [];
+    let pendingDesignUploads = [];
+
+    function loadAtelierState() {
+      try {
+        const raw = localStorage.getItem(ATELIER_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object' && Array.isArray(parsed.orders)) {
+            parsed.orders = parsed.orders.map((o) => ({
+              ...o,
+              photoEntries: normalizeOrderPhotoEntries(o)
+            }));
+            return parsed;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load Stitch Log state', err);
+      }
+      const initial = getDefaultAtelierState();
+      try {
+        localStorage.setItem(ATELIER_KEY, JSON.stringify(initial));
+      } catch (e) {}
+      return initial;
+    }
+
+    function saveAtelierState() {
+      try {
+        localStorage.setItem(ATELIER_KEY, JSON.stringify(atelier));
+        return true;
+      } catch (err) {
+        console.error('Failed to save Stitch Log state', err);
+        showToast('Storage full — consider removing old high-res photos.');
+        return false;
+      }
+    }
+
+    function showToast(msg, tone = 'rose') {
+      const box = document.getElementById('toast-container');
+      const el = document.createElement('div');
+      const styles = tone === 'gold'
+        ? 'bg-forest text-ivory border-gold'
+        : 'bg-white text-forest border-roseDust shadow-roseGlow';
+      el.className = `pointer-events-auto px-4 py-2.5 rounded-full border text-xs font-bold flex items-center gap-2 transition-all duration-300 opacity-0 translate-y-2 ${styles}`;
+      el.innerHTML = `<span class="w-2 h-2 rounded-full ${tone === 'gold' ? 'bg-gold' : 'bg-roseDeep'}"></span><span>${escapeHTML(msg)}</span>`;
+      box.appendChild(el);
+      requestAnimationFrame(() => el.classList.remove('opacity-0', 'translate-y-2'));
+      setTimeout(() => {
+        el.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => el.remove(), 300);
+      }, 2800);
+    }
+
+    // =========================================================
+    // LANGUAGE & AUTHENTICATION
+    // =========================================================
+    function populateLanguageSelects() {
+      const optionsHtml = LANGUAGES.map((l) => `<option value="${l.code}">${l.label}</option>`).join('');
+      ['auth-lang-select', 'signup-lang', 'header-lang-desktop', 'header-lang-mobile', 'set-language'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.innerHTML = optionsHtml;
+          el.value = atelier.language || 'en';
+        }
+      });
+    }
+
+    function changeLanguage(langCode) {
+      atelier.language = langCode;
+      saveAtelierState();
+      populateLanguageSelects();
+      applyTranslations();
+      if (atelier.isAuthenticated) {
+        renderAllViews();
+      }
+    }
+
+    function applyTranslations() {
+      const dict = I18N[atelier.language] || I18N.en;
+      document.querySelectorAll('[data-i18n]').forEach((el) => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.textContent = dict[key];
+        }
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (dict[key]) {
+          el.setAttribute('placeholder', dict[key]);
+        }
+      });
+      const stageFilter = document.getElementById('stage-filter');
+      if (stageFilter) {
+        const currentVal = stageFilter.value;
+        stageFilter.innerHTML = `
+          <option value="All">${escapeHTML(t('allStages'))}</option>
+          ${ORDER_STAGES.map((st) => `<option value="${escapeHTML(st)}">${escapeHTML(translateStageLabel(st))}</option>`).join('')}
+        `;
+        stageFilter.value = currentVal || 'All';
+      }
+    }
+
+    function setAuthMode(mode) {
+      const loginForm = document.getElementById('login-form');
+      const signupForm = document.getElementById('signup-form');
+      const tabLogin = document.getElementById('tab-auth-login');
+      const tabSignup = document.getElementById('tab-auth-signup');
+
+      if (mode === 'login') {
+        loginForm.classList.remove('hidden');
+        signupForm.classList.add('hidden');
+        tabLogin.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-forest text-ivory transition-all';
+        tabSignup.className = 'px-4 py-1.5 rounded-full text-xs font-bold text-taupe hover:text-forest transition-all';
+      } else {
+        loginForm.classList.add('hidden');
+        signupForm.classList.remove('hidden');
+        tabSignup.className = 'px-4 py-1.5 rounded-full text-xs font-bold bg-forest text-ivory transition-all';
+        tabLogin.className = 'px-4 py-1.5 rounded-full text-xs font-bold text-taupe hover:text-forest transition-all';
+      }
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const idVal = document.getElementById('login-identifier').value.trim().toLowerCase();
+      const passVal = document.getElementById('login-password').value;
+
+      if (!atelier.account || !atelier.account.email) {
+        showToast('No tailor account found. Please create an account first.');
+        setAuthMode('signup');
+        return;
+      }
+
+      const emailMatch =
+        idVal === atelier.account.email.toLowerCase() ||
+        idVal === atelier.account.tailorName.toLowerCase();
+
+      if (emailMatch && passVal === atelier.account.password) {
+        atelier.isAuthenticated = true;
+        saveAtelierState();
+        enterAtelierShell();
+        showToast(`Welcome, ${atelier.account.tailorName}!`, 'gold');
+      } else {
+        showToast('Credentials did not match. Try Demo Account or Create Account.');
+      }
+    }
+
+    function useDemoTailorLogin() {
+      const demo = getDefaultAtelierState();
+      if (!atelier.account || !atelier.account.email) {
+        atelier.account = demo.account;
+      }
+      if (!Array.isArray(atelier.orders) || atelier.orders.length === 0) {
+        atelier.orders = demo.orders;
+      }
+      document.getElementById('login-identifier').value = atelier.account.email;
+      document.getElementById('login-password').value = atelier.account.password;
+      atelier.isAuthenticated = true;
+      saveAtelierState();
+      enterAtelierShell();
+      showToast(`Signed in to ${atelier.account.boutiqueName}.`, 'gold');
+    }
+
+    function handleSignupSubmit(e) {
+      e.preventDefault();
+      const boutiqueName = document.getElementById('signup-boutique').value.trim();
+      const tailorName = document.getElementById('signup-tailor').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const lang = document.getElementById('signup-lang').value;
+
+      atelier.account = { boutiqueName, tailorName, email, password };
+      if (!Array.isArray(atelier.orders)) {
+        atelier.orders = [];
+      }
+      atelier.language = lang;
+      atelier.isAuthenticated = true;
+      saveAtelierState();
+      populateLanguageSelects();
+      applyTranslations();
+      enterAtelierShell();
+      showToast(`${boutiqueName} account created!`, 'gold');
+    }
+
+    function logoutTailor() {
+      atelier.isAuthenticated = false;
+      saveAtelierState();
+      document.getElementById('app-shell').classList.add('hidden');
+      document.getElementById('auth-screen').classList.remove('hidden');
+      showToast('Signed out of Stitch Log.');
+    }
+
+    function enterAtelierShell() {
+      document.getElementById('auth-screen').classList.add('hidden');
+      document.getElementById('app-shell').classList.remove('hidden');
+      syncHeaderIdentity();
+      applyTranslations();
+      setGenderLedger(atelier.genderLedger || 'All');
+      renderAllViews();
+    }
+
+    function syncHeaderIdentity() {
+      const bName = atelier.account?.boutiqueName || 'Stitch Log';
+      const tName = atelier.account?.tailorName || 'Master Tailor';
+      const boutiqueEl = document.getElementById('header-boutique-name');
+      if (boutiqueEl) boutiqueEl.textContent = bName;
+      document.getElementById('header-tailor-name').textContent = tName;
+      document.getElementById('set-boutique-name').value = bName;
+      document.getElementById('set-tailor-name').value = tName;
+    }
+
+    // =========================================================
+    // MAIN NAVIGATION & OVERDUE HELPERS
+    // =========================================================
+    function switchMainTab(tab) {
+      ['ledger', 'deliveries', 'settings'].forEach((t) => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`mnav-${t}`);
+        btn.classList.remove('bg-forest', 'text-ivory', 'shadow-sm');
+        btn.classList.add('text-espresso', 'hover:text-forest');
+      });
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`mnav-${tab}`);
+      activeBtn.classList.add('bg-forest', 'text-ivory', 'shadow-sm');
+      activeBtn.classList.remove('text-espresso', 'hover:text-forest');
+
+      if (tab === 'ledger') renderCustomerOrders();
+      if (tab === 'deliveries') renderDeliveriesView();
+      if (tab === 'settings') syncHeaderIdentity();
+    }
+
+    function isOrderOverdue(order) {
+      if (!order.deliveryDate || order.stage === 'Ready for Delivery') return false;
+      return order.deliveryDate < todayISO();
+    }
+
+    function updateOverdueBadges() {
+      const overdueCount = atelier.orders.filter(isOrderOverdue).length;
+      const navBadge = document.getElementById('nav-overdue-badge');
+      if (overdueCount > 0) {
+        navBadge.textContent = overdueCount;
+        navBadge.classList.remove('hidden');
+      } else {
+        navBadge.classList.add('hidden');
+      }
+      document.getElementById('kpi-overdue-orders').textContent = overdueCount;
+    }
+
+    function renderAllViews() {
+      updateOverdueBadges();
+      renderCustomerOrders();
+      renderDeliveriesView();
+    }
+
+    // =========================================================
+    // TAB 1: CUSTOMER MEASUREMENTS LEDGER & ORDERS
+    // =========================================================
+    function setGenderLedger(gender) {
+      atelier.genderLedger = gender;
+      saveAtelierState();
+      document.querySelectorAll('.gender-pill').forEach((btn) => {
+        if (btn.dataset.gender === gender) {
+          btn.className = 'gender-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-roseBlush text-forest border border-roseDust transition-all';
+        } else {
+          btn.className = 'gender-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-ivory text-taupe border border-gold/40 hover:border-roseDust transition-all flex items-center gap-1.5';
+        }
+      });
+      renderCustomerOrders();
+    }
+
+    function renderCustomerOrders() {
+      updateOverdueBadges();
+      const totalClients = atelier.orders.length;
+      const activeOrders = atelier.orders.filter((o) => o.stage !== 'Ready for Delivery').length;
+      const completedOrders = atelier.orders.filter((o) => o.stage === 'Ready for Delivery').length;
+
+      document.getElementById('kpi-total-clients').textContent = totalClients;
+      document.getElementById('kpi-active-orders').textContent = activeOrders;
+      document.getElementById('kpi-completed-orders').textContent = completedOrders;
+
+      const query = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
+      const stageFilter = document.getElementById('stage-filter')?.value || 'All';
+
+      const filtered = atelier.orders.filter((o) => {
+        const matchGender = atelier.genderLedger === 'All' || o.gender === atelier.genderLedger;
+        const matchStage = stageFilter === 'All' || o.stage === stageFilter;
+        const matchQuery =
+          !query ||
+          o.customerName.toLowerCase().includes(query) ||
+          o.phone.toLowerCase().includes(query) ||
+          o.garmentType.toLowerCase().includes(query);
+        return matchGender && matchStage && matchQuery;
+      });
+
+      const grid = document.getElementById('orders-grid');
+      const empty = document.getElementById('orders-empty');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      grid.innerHTML = filtered
+        .map((order) => {
+          const overdue = isOrderOverdue(order);
+          const stageIdx = Math.max(0, ORDER_STAGES.indexOf(order.stage));
+          const progressPct = Math.round(((stageIdx + 1) / ORDER_STAGES.length) * 100);
+          const qcDone = Object.values(order.checklist || {}).filter(Boolean).length;
+          const qcTotal = QUALITY_CHECKLIST_TEMPLATE.length;
+          const photoEntries = normalizeOrderPhotoEntries(order);
+          const visitCount = photoEntries.length;
+          const latestFab = photoEntries[0]?.fabricPhotos?.[0] || order.fabricPhoto || SAMPLE_IMAGES.roseSilk;
+          const latestDes = photoEntries[0]?.designPhotos?.[0] || order.designPhoto || SAMPLE_IMAGES.coutureSketch;
+
+          const keyMeas =
+            order.gender === 'Women'
+              ? `Bust ${order.measurements?.bust ?? '-'}" · Waist ${order.measurements?.waist ?? '-'}" · Hip ${order.measurements?.hip ?? '-'}"`
+              : `Chest ${order.measurements?.chest ?? '-'}" · Waist ${order.measurements?.waist ?? '-'}" · Shoulder ${order.measurements?.shoulder ?? '-'}"`;
+
+          return `
+            <article class="bg-white/95 rounded-3xl p-5 border ${overdue ? 'border-roseDeep ring-1 ring-roseDust/60' : 'border-gold/50'} shadow-card hover:shadow-editorial transition-all flex flex-col justify-between">
+              <div>
+                <!-- Top Badges -->
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${order.gender === 'Women' ? 'bg-roseBlush text-forest border border-roseDust' : 'bg-forest text-ivory'}">
+                      ${escapeHTML(order.gender)}
+                    </span>
+                    ${overdue ? `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-roseDeep text-ivory">${escapeHTML(t('overdueBadge'))}</span>` : ''}
+                    ${order.reminderSent ? `<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-parchment text-forest border border-gold/40">${escapeHTML(t('remindedBadge'))}</span>` : ''}
+                  </div>
+                  <span class="text-[11px] font-mono text-taupe">${escapeHTML(t('duePrefix'))} ${escapeHTML(order.deliveryDate)}</span>
+                </div>
+
+                <!-- Client & Garment -->
+                <h3 class="font-editorial text-2xl font-bold text-forest leading-snug">${escapeHTML(order.customerName)}</h3>
+                <p class="text-xs text-roseDeep font-bold mt-0.5">${escapeHTML(order.garmentType)} <span class="text-taupe font-normal font-mono">· ${escapeHTML(order.phone)}</span></p>
+
+                <!-- Fabric & Reference Design Thumbnails -->
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                  <div class="relative rounded-xl overflow-hidden border border-gold/35 h-20 bg-parchment">
+                    <img src="${latestFab}" alt="Fabric" class="w-full h-full object-cover" />
+                    <span class="absolute bottom-1 left-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-forest/80 text-ivory">Fabric</span>
+                  </div>
+                  <div class="relative rounded-xl overflow-hidden border border-roseDust/50 h-20 bg-roseTint">
+                    <img src="${latestDes}" alt="Reference Design" class="w-full h-full object-cover" />
+                    <span class="absolute bottom-1 left-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-roseDeep/85 text-ivory">Design</span>
+                  </div>
+                </div>
+
+                <!-- Key Inch Measurements Summary -->
+                <div class="mt-3 bg-ivory rounded-2xl p-3 border border-gold/30 text-xs font-mono text-espresso">
+                  ${escapeHTML(keyMeas)}
+                </div>
+
+                <!-- Style, QC & Date-Stamped Photo Sets -->
+                <div class="mt-3 flex flex-wrap gap-1.5 text-[11px]">
+                  <span class="px-2.5 py-0.5 rounded-full bg-parchment text-taupe border border-gold/30">${escapeHTML(order.stylePreferences?.fit || 'Classic Fit')}</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-roseTint text-forest border border-roseDust/50">QC ${qcDone}/${qcTotal}</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-ivory text-forest border border-gold/40 font-mono">
+                    ${visitCount} Date ${visitCount === 1 ? 'Set' : 'Sets'}
+                  </span>
+                </div>
+
+                <!-- Interactive Stage Pipeline Bar -->
+                <div class="mt-4">
+                  <div class="flex items-center justify-between text-[11px] mb-1">
+                    <span class="font-bold text-forest">${escapeHTML(translateStageLabel(order.stage))}</span>
+                    <span class="font-mono text-taupe">${progressPct}%</span>
+                  </div>
+                  <div class="w-full h-2 bg-parchment rounded-full overflow-hidden border border-gold/30">
+                    <div class="h-full rounded-full transition-all duration-300" style="width: ${progressPct}%; background: linear-gradient(90deg, #D47A96 0%, #B69252 100%);"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Row -->
+              <div class="mt-5 pt-3.5 border-t border-gold/25 flex items-center justify-between gap-2">
+                <button onclick="openCustomerDetailModal('${order.id}')" class="btn-tactile flex-1 py-2 px-3.5 rounded-full bg-roseBlush hover:bg-roseDust/60 text-forest border border-roseDust text-xs font-bold flex items-center justify-center gap-1.5">
+                  <i class="ph-fill ph-notebook text-roseDeep"></i>
+                  <span>${escapeHTML(t('folioAndFit'))}</span>
+                </button>
+                <button onclick="advanceOrderStage('${order.id}')" title="Advance Order Stage" class="btn-tactile px-3 py-2 rounded-full bg-forest hover:bg-forestLight text-ivory border border-gold text-xs font-bold flex items-center gap-1">
+                  <i class="ph-bold ph-arrow-right text-roseDust"></i>
+                  <span>${escapeHTML(t('stageBtn'))}</span>
+                </button>
+                <button onclick="openCustomerOrderModal('${order.id}')" title="Edit Customer" class="w-8 h-8 rounded-full bg-ivory hover:bg-parchment border border-gold/45 flex items-center justify-center text-forest">
+                  <i class="ph-bold ph-pencil-simple"></i>
+                </button>
+                <button onclick="promptDeleteCustomer('${order.id}')" title="Delete Customer" class="w-8 h-8 rounded-full bg-ivory hover:bg-roseBlush border border-gold/45 flex items-center justify-center text-taupe hover:text-roseDeep">
+                  <i class="ph-bold ph-trash"></i>
+                </button>
+              </div>
+            </article>
+          `;
+        })
+        .join('');
+    }
+
+    function advanceOrderStage(orderId) {
+      const order = atelier.orders.find((o) => o.id === orderId);
+      if (!order) return;
+      const idx = ORDER_STAGES.indexOf(order.stage);
+      const nextIdx = (idx + 1) % ORDER_STAGES.length;
+      order.stage = ORDER_STAGES[nextIdx];
+      saveAtelierState();
+      renderAllViews();
+      showToast(`${order.customerName}: ${translateStageLabel(order.stage)}`, 'gold');
+    }
+
+    // =========================================================
+    // MAIN NAVIGATION & OVERDUE HELPERS
+    // =========================================================
+    function switchMainTab(tab) {
+      ['ledger', 'deliveries', 'settings'].forEach((t) => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`mnav-${t}`);
+        btn.classList.remove('bg-forest', 'text-ivory', 'shadow-sm');
+        btn.classList.add('text-espresso', 'hover:text-forest');
+      });
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`mnav-${tab}`);
+      activeBtn.classList.add('bg-forest', 'text-ivory', 'shadow-sm');
+      activeBtn.classList.remove('text-espresso', 'hover:text-forest');
+
+      if (tab === 'ledger') renderCustomerOrders();
+      if (tab === 'deliveries') renderDeliveriesView();
+      if (tab === 'settings') {
+        syncLogos();
+        syncHeaderIdentity();
+      }
+    }
+
+    function isOrderOverdue(order) {
+      if (!order.deliveryDate || order.stage === 'Ready for Delivery') return false;
+      return order.deliveryDate < todayISO();
+    }
+
+    function updateOverdueBadges() {
+      const overdueCount = atelier.orders.filter(isOrderOverdue).length;
+      const navBadge = document.getElementById('nav-overdue-badge');
+      if (overdueCount > 0) {
+        navBadge.textContent = overdueCount;
+        navBadge.classList.remove('hidden');
+      } else {
+        navBadge.classList.add('hidden');
+      }
+      document.getElementById('kpi-overdue-orders').textContent = overdueCount;
+    }
+
+    function renderAllViews() {
+      syncLogos();
+      updateOverdueBadges();
+      renderCustomerOrders();
+      renderDeliveriesView();
+    }
+
+    // =========================================================
+    // TAB 1: CUSTOMER MEASUREMENTS LEDGER & ORDERS
+    // =========================================================
+    function setGenderLedger(gender) {
+      atelier.genderLedger = gender;
+      saveAtelierState();
+      document.querySelectorAll('.gender-pill').forEach((btn) => {
+        if (btn.dataset.gender === gender) {
+          btn.className = 'gender-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-roseBlush text-forest border border-roseDust transition-all';
+        } else {
+          btn.className = 'gender-pill px-3.5 py-1.5 rounded-full text-xs font-bold bg-ivory text-taupe border border-gold/40 hover:border-roseDust transition-all flex items-center gap-1.5';
+        }
+      });
+      renderCustomerOrders();
+    }
+
+    function renderCustomerOrders() {
+      updateOverdueBadges();
+      const totalClients = atelier.orders.length;
+      const activeOrders = atelier.orders.filter((o) => o.stage !== 'Ready for Delivery').length;
+      const completedOrders = atelier.orders.filter((o) => o.stage === 'Ready for Delivery').length;
+
+      document.getElementById('kpi-total-clients').textContent = totalClients;
+      document.getElementById('kpi-active-orders').textContent = activeOrders;
+      document.getElementById('kpi-completed-orders').textContent = completedOrders;
+
+      const query = (document.getElementById('search-input')?.value || '').trim().toLowerCase();
+      const stageFilter = document.getElementById('stage-filter')?.value || 'All';
+
+      const filtered = atelier.orders.filter((o) => {
+        const matchGender = atelier.genderLedger === 'All' || o.gender === atelier.genderLedger;
+        const matchStage = stageFilter === 'All' || o.stage === stageFilter;
+        const matchQuery =
+          !query ||
+          o.customerName.toLowerCase().includes(query) ||
+          o.phone.toLowerCase().includes(query) ||
+          o.garmentType.toLowerCase().includes(query);
+        return matchGender && matchStage && matchQuery;
+      });
+
+      const grid = document.getElementById('orders-grid');
+      const empty = document.getElementById('orders-empty');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+      empty.classList.add('hidden');
+
+      grid.innerHTML = filtered
+        .map((order) => {
+          const overdue = isOrderOverdue(order);
+          const stageIdx = Math.max(0, ORDER_STAGES.indexOf(order.stage));
+          const progressPct = Math.round(((stageIdx + 1) / ORDER_STAGES.length) * 100);
+          const qcDone = Object.values(order.checklist || {}).filter(Boolean).length;
+          const qcTotal = QUALITY_CHECKLIST_TEMPLATE.length;
+          const photoEntries = normalizeOrderPhotoEntries(order);
+          const visitCount = photoEntries.length;
+          const latestFab = photoEntries[0]?.fabricPhotos?.[0] || order.fabricPhoto || SAMPLE_IMAGES.roseSilk;
+          const latestDes = photoEntries[0]?.designPhotos?.[0] || order.designPhoto || SAMPLE_IMAGES.coutureSketch;
+
+          const keyMeas =
+            order.gender === 'Women'
+              ? `Bust ${order.measurements?.bust ?? '-'}" · Waist ${order.measurements?.waist ?? '-'}" · Hip ${order.measurements?.hip ?? '-'}"`
+              : `Chest ${order.measurements?.chest ?? '-'}" · Waist ${order.measurements?.waist ?? '-'}" · Shoulder ${order.measurements?.shoulder ?? '-'}"`;
+
+          return `
+            <article class="bg-white/95 rounded-3xl p-5 border ${overdue ? 'border-roseDeep ring-1 ring-roseDust/60' : 'border-gold/50'} shadow-card hover:shadow-editorial transition-all flex flex-col justify-between">
+              <div>
+                <!-- Top Badges -->
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${order.gender === 'Women' ? 'bg-roseBlush text-forest border border-roseDust' : 'bg-forest text-ivory'}">
+                      ${escapeHTML(order.gender)}
+                    </span>
+                    ${overdue ? '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-roseDeep text-ivory">Overdue</span>' : ''}
+                    ${order.reminderSent ? '<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-parchment text-forest border border-gold/40">Reminded</span>' : ''}
+                  </div>
+                  <span class="text-[11px] font-mono text-taupe">Due ${escapeHTML(order.deliveryDate)}</span>
+                </div>
+
+                <!-- Client & Garment -->
+                <h3 class="font-editorial text-2xl font-bold text-forest leading-snug">${escapeHTML(order.customerName)}</h3>
+                <p class="text-xs text-roseDeep font-bold mt-0.5">${escapeHTML(order.garmentType)} <span class="text-taupe font-normal font-mono">· ${escapeHTML(order.phone)}</span></p>
+
+                <!-- Fabric & Reference Design Thumbnails -->
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                  <div class="relative rounded-xl overflow-hidden border border-gold/35 h-20 bg-parchment">
+                    <img src="${latestFab}" alt="Fabric" class="w-full h-full object-cover" />
+                    <span class="absolute bottom-1 left-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-forest/80 text-ivory">Fabric</span>
+                  </div>
+                  <div class="relative rounded-xl overflow-hidden border border-roseDust/50 h-20 bg-roseTint">
+                    <img src="${latestDes}" alt="Reference Design" class="w-full h-full object-cover" />
+                    <span class="absolute bottom-1 left-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-roseDeep/85 text-ivory">Design</span>
+                  </div>
+                </div>
+
+                <!-- Key Inch Measurements Summary -->
+                <div class="mt-3 bg-ivory rounded-2xl p-3 border border-gold/30 text-xs font-mono text-espresso">
+                  ${escapeHTML(keyMeas)}
+                </div>
+
+                <!-- Style, QC & Date-Stamped Photo Sets -->
+                <div class="mt-3 flex flex-wrap gap-1.5 text-[11px]">
+                  <span class="px-2.5 py-0.5 rounded-full bg-parchment text-taupe border border-gold/30">${escapeHTML(order.stylePreferences?.fit || 'Classic Fit')}</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-roseTint text-forest border border-roseDust/50">QC ${qcDone}/${qcTotal}</span>
+                  <span class="px-2.5 py-0.5 rounded-full bg-ivory text-forest border border-gold/40 font-mono">
+                    ${visitCount} Date ${visitCount === 1 ? 'Set' : 'Sets'}
+                  </span>
+                </div>
+
+                <!-- Interactive Stage Pipeline Bar -->
+                <div class="mt-4">
+                  <div class="flex items-center justify-between text-[11px] mb-1">
+                    <span class="font-bold text-forest">${escapeHTML(order.stage)}</span>
+                    <span class="font-mono text-taupe">${progressPct}%</span>
+                  </div>
+                  <div class="w-full h-2 bg-parchment rounded-full overflow-hidden border border-gold/30">
+                    <div class="h-full rounded-full transition-all duration-300" style="width: ${progressPct}%; background: linear-gradient(90deg, #D47A96 0%, #B69252 100%);"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Row -->
+              <div class="mt-5 pt-3.5 border-t border-gold/25 flex items-center justify-between gap-2">
+                <button onclick="openCustomerDetailModal('${order.id}')" class="btn-tactile flex-1 py-2 px-3.5 rounded-full bg-roseBlush hover:bg-roseDust/60 text-forest border border-roseDust text-xs font-bold flex items-center justify-center gap-1.5">
+                  <i class="ph-fill ph-notebook text-roseDeep"></i>
+                  <span>Folio &amp; Fit</span>
+                </button>
+                <button onclick="advanceOrderStage('${order.id}')" title="Advance Order Stage" class="btn-tactile px-3 py-2 rounded-full bg-forest hover:bg-forestLight text-ivory border border-gold text-xs font-bold flex items-center gap-1">
+                  <i class="ph-bold ph-arrow-right text-roseDust"></i>
+                  <span>Stage</span>
+                </button>
+                <button onclick="openCustomerOrderModal('${order.id}')" title="Edit Customer" class="w-8 h-8 rounded-full bg-ivory hover:bg-parchment border border-gold/45 flex items-center justify-center text-forest">
+                  <i class="ph-bold ph-pencil-simple"></i>
+                </button>
+                <button onclick="promptDeleteCustomer('${order.id}')" title="Delete Customer" class="w-8 h-8 rounded-full bg-ivory hover:bg-roseBlush border border-gold/45 flex items-center justify-center text-taupe hover:text-roseDeep">
+                  <i class="ph-bold ph-trash"></i>
+                </button>
+              </div>
+            </article>
+          `;
+        })
+        .join('');
+    }
+
+    function advanceOrderStage(orderId) {
+      const order = atelier.orders.find((o) => o.id === orderId);
+      if (!order) return;
+      const idx = ORDER_STAGES.indexOf(order.stage);
+      const nextIdx = (idx + 1) % ORDER_STAGES.length;
+      order.stage = ORDER_STAGES[nextIdx];
+      saveAtelierState();
+      renderAllViews();
+      showToast(`${order.customerName}: ${order.stage}`, 'gold');
+    }
+
+    // =========================================================
+    // IMAGE COMPRESSION & DATE-STAMPED PHOTO LOG HELPERS
+    // =========================================================
+    function compressImageDataUrl(dataUrl, maxDim = 640, quality = 0.72) {
+      return new Promise((resolve) => {
+        if (!dataUrl || dataUrl.startsWith('data:image/svg+xml')) {
+          resolve(dataUrl);
+          return;
+        }
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          try {
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          } catch (err) {
+            resolve(dataUrl);
+          }
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+      });
+    }
+
+    function renderModalPhotoLogList() {
+      const container = document.getElementById('cm-photo-log-list');
+      if (!container) return;
+      if (modalStagedPhotoEntries.length === 0) {
+        container.innerHTML = `<p class="text-[11px] text-taupe italic">No dated fabric/reference sets logged yet. Choose photos above with the Date Given and click "Add Date Entry to Log" (or save folio directly).</p>`;
+        return;
+      }
+
+      container.innerHTML = modalStagedPhotoEntries
+        .map((entry, idx) => {
+          const fabThumbs = (entry.fabricPhotos || [])
+            .map((src) => `<img src="${src}" alt="Fabric" class="w-12 h-12 object-cover rounded-lg border border-gold/40" />`)
+            .join('');
+          const desThumbs = (entry.designPhotos || [])
+            .map((src) => `<img src="${src}" alt="Reference" class="w-12 h-12 object-cover rounded-lg border border-roseDust/60" />`)
+            .join('');
+          return `
+            <div class="bg-ivory rounded-xl p-3 border border-gold/35 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-roseBlush text-forest border border-roseDust">
+                    Given: ${escapeHTML(entry.dateGiven || todayISO())}
+                  </span>
+                  <span class="text-xs font-bold text-forest">${escapeHTML(entry.note || 'Fabric & Reference Set')}</span>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap pt-1">
+                  ${fabThumbs ? `<span class="text-[10px] uppercase text-taupe font-bold">Fabrics:</span>${fabThumbs}` : ''}
+                  ${desThumbs ? `<span class="text-[10px] uppercase text-roseDeep font-bold ml-1">Refs:</span>${desThumbs}` : ''}
+                </div>
+              </div>
+              <button type="button" onclick="removeModalPhotoEntry(${idx})" title="Remove this date entry" class="self-end sm:self-center px-2.5 py-1 rounded-full bg-white hover:bg-roseBlush text-taupe hover:text-roseDeep border border-gold/40 text-[11px] font-bold flex items-center gap-1">
+                <i class="ph-bold ph-trash"></i>
+                <span>Remove</span>
+              </button>
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function removeModalPhotoEntry(index) {
+      modalStagedPhotoEntries.splice(index, 1);
+      renderModalPhotoLogList();
+      showToast('Removed photo entry from log.');
+    }
+
+    function stagePhotoBatchInModal(silent = false) {
+      const dateGiven = document.getElementById('cm-photo-date').value || todayISO();
+      const note = document.getElementById('cm-photo-batch-note').value.trim();
+      const fabSingle = document.getElementById('cm-fabric-data').value;
+      const desSingle = document.getElementById('cm-design-data').value;
+
+      const fabricPhotos = pendingFabricUploads.length > 0 ? [...pendingFabricUploads] : fabSingle ? [fabSingle] : [];
+      const designPhotos = pendingDesignUploads.length > 0 ? [...pendingDesignUploads] : desSingle ? [desSingle] : [];
+
+      if (fabricPhotos.length === 0 && designPhotos.length === 0) {
+        if (!silent) showToast('Select at least one fabric or reference image first.');
+        return false;
+      }
+
+      modalStagedPhotoEntries.unshift({
+        id: 'pe-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
+        dateGiven,
+        note: note || `Handover on ${dateGiven}`,
+        fabricPhotos,
+        designPhotos
+      });
+
+      pendingFabricUploads = [];
+      pendingDesignUploads = [];
+      document.getElementById('cm-fabric-data').value = '';
+      document.getElementById('cm-design-data').value = '';
+      document.getElementById('cm-fabric-preview').classList.add('hidden');
+      document.getElementById('cm-design-preview').classList.add('hidden');
+      document.getElementById('cm-photo-batch-note').value = '';
+      const fabFile = document.getElementById('cm-fabric-file');
+      const desFile = document.getElementById('cm-design-file');
+      if (fabFile) fabFile.value = '';
+      if (desFile) desFile.value = '';
+
+      renderModalPhotoLogList();
+      if (!silent) showToast(`Added photos for ${dateGiven} to client log!`, 'gold');
+      return true;
+    }
+
+    // =========================================================
+    // ADD / EDIT CUSTOMER ORDER MODAL & MEASUREMENT INPUTS
+    // =========================================================
+    function renderMeasurementInputs(existingMeas = {}) {
+      const gender = document.getElementById('cm-gender').value;
+      const fields = gender === 'Women' ? WOMEN_MEASUREMENTS : MEN_MEASUREMENTS;
+      document.getElementById('cm-meas-heading').textContent = `${gender}'s Measurements (in inches)`;
+      document.getElementById('cm-measurements-grid').innerHTML = fields
+        .map((f) => {
+          const val = existingMeas[f.key] !== undefined ? existingMeas[f.key] : '';
+          return `
+            <div>
+              <label class="block text-[11px] font-bold text-taupe mb-1">${f.label} (in)</label>
+              <input type="number" step="0.25" min="0" data-meas-key="${f.key}" value="${val}" placeholder="0.00" class="cm-meas-input w-full bg-ivory border border-gold/45 rounded-xl px-3 py-1.5 text-xs font-mono text-espresso focus:outline-none focus:border-roseDust" />
+            </div>
+          `;
+        })
+        .join('');
+    }
+
+    function openCustomerOrderModal(editId = null) {
+      const modal = document.getElementById('customer-modal');
+      const form = document.getElementById('customer-order-form');
+      form.reset();
+      document.getElementById('cm-fabric-preview').classList.add('hidden');
+      document.getElementById('cm-design-preview').classList.add('hidden');
+      document.getElementById('cm-fabric-data').value = '';
+      document.getElementById('cm-design-data').value = '';
+      document.getElementById('cm-photo-date').value = todayISO();
+      pendingFabricUploads = [];
+      pendingDesignUploads = [];
+
+      if (editId) {
+        const o = atelier.orders.find((item) => item.id === editId);
+        if (!o) return;
+        document.getElementById('cm-modal-title').textContent = `Edit Folio — ${o.customerName}`;
+        document.getElementById('cm-edit-id').value = o.id;
+        document.getElementById('cm-name').value = o.customerName;
+        document.getElementById('cm-phone').value = o.phone;
+        document.getElementById('cm-gender').value = o.gender;
+        document.getElementById('cm-delivery-date').value = o.deliveryDate;
+        document.getElementById('cm-garment').value = o.garmentType;
+        document.getElementById('cm-design-name').value = o.designName || '';
+        document.getElementById('cm-stage').value = o.stage;
+        document.getElementById('cm-fit-pref').value = o.stylePreferences?.fit || 'Classic / Balanced Ease';
+        document.getElementById('cm-neck-pref').value = o.stylePreferences?.neckOrCollar || '';
+        document.getElementById('cm-comfort-pref').value = o.stylePreferences?.comfortNotes || '';
+        document.getElementById('cm-notes').value = o.notes || '';
+
+        modalStagedPhotoEntries = JSON.parse(JSON.stringify(normalizeOrderPhotoEntries(o)));
+        renderModalPhotoLogList();
+        renderMeasurementInputs(o.measurements || {});
+      } else {
+        document.getElementById('cm-modal-title').textContent = 'New Customer Measurement & Order';
+        document.getElementById('cm-edit-id').value = '';
+        const defaultDue = new Date();
+        defaultDue.setDate(defaultDue.getDate() + 10);
+        document.getElementById('cm-delivery-date').value = defaultDue.toISOString().split('T')[0];
+
+        modalStagedPhotoEntries = [];
+        renderModalPhotoLogList();
+        renderMeasurementInputs({});
+      }
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeCustomerModal() {
+      const modal = document.getElementById('customer-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function handlePhotoFileUpload(event, kind) {
+      const files = Array.from(event.target.files || []);
+      if (files.length === 0) return;
+
+      const compressedList = [];
+      for (const file of files) {
+        const rawUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(file);
+        });
+        compressedList.push(await compressImageDataUrl(rawUrl));
+      }
+
+      if (kind === 'fabric') {
+        pendingFabricUploads = compressedList;
+        document.getElementById('cm-fabric-data').value = compressedList[0];
+        const img = document.getElementById('cm-fabric-preview');
+        img.src = compressedList[0];
+        img.classList.remove('hidden');
+      } else {
+        pendingDesignUploads = compressedList;
+        document.getElementById('cm-design-data').value = compressedList[0];
+        const img = document.getElementById('cm-design-preview');
+        img.src = compressedList[0];
+        img.classList.remove('hidden');
+      }
+      showToast(`${compressedList.length} ${kind} photo(s) ready — click "Add Date Entry to Log" or Save.`);
+    }
+
+    function applyPresetPhoto(kind, presetKey) {
+      const url = SAMPLE_IMAGES[presetKey];
+      if (!url) return;
+      if (kind === 'fabric') {
+        pendingFabricUploads = [url];
+        document.getElementById('cm-fabric-data').value = url;
+        const img = document.getElementById('cm-fabric-preview');
+        img.src = url;
+        img.classList.remove('hidden');
+      } else {
+        pendingDesignUploads = [url];
+        document.getElementById('cm-design-data').value = url;
+        const img = document.getElementById('cm-design-preview');
+        img.src = url;
+        img.classList.remove('hidden');
+      }
+      showToast('Sample swatch applied.');
+    }
+
+    function saveCustomerOrderForm(e) {
+      e.preventDefault();
+      stagePhotoBatchInModal(true);
+
+      const editId = document.getElementById('cm-edit-id').value;
+      const customerName = document.getElementById('cm-name').value.trim();
+      const phone = document.getElementById('cm-phone').value.trim();
+      const gender = document.getElementById('cm-gender').value;
+      const deliveryDate = document.getElementById('cm-delivery-date').value;
+      const garmentType = document.getElementById('cm-garment').value.trim();
+      const stage = document.getElementById('cm-stage').value;
+      const designName = document.getElementById('cm-design-name').value.trim();
+      const notes = document.getElementById('cm-notes').value.trim();
+
+      const measurements = {};
+      document.querySelectorAll('.cm-meas-input').forEach((inp) => {
+        const key = inp.getAttribute('data-meas-key');
+        const num = parseFloat(inp.value);
+        if (!Number.isNaN(num)) measurements[key] = num;
+      });
+
+      const stylePreferences = {
+        fit: document.getElementById('cm-fit-pref').value,
+        neckOrCollar: document.getElementById('cm-neck-pref').value.trim(),
+        comfortNotes: document.getElementById('cm-comfort-pref').value.trim()
+      };
+
+      const latestEntry = modalStagedPhotoEntries[0];
+      const fabricPhoto = latestEntry?.fabricPhotos?.[0] || SAMPLE_IMAGES.roseSilk;
+      const designPhoto = latestEntry?.designPhotos?.[0] || SAMPLE_IMAGES.coutureSketch;
+
+      if (editId) {
+        const idx = atelier.orders.findIndex((o) => o.id === editId);
+        if (idx !== -1) {
+          const existing = atelier.orders[idx];
+          atelier.orders[idx] = {
+            ...existing,
+            customerName,
+            phone,
+            gender,
+            deliveryDate,
+            garmentType,
+            stage,
+            designName,
+            fabricPhoto,
+            designPhoto,
+            photoEntries: [...modalStagedPhotoEntries],
+            notes,
+            measurements,
+            stylePreferences
+          };
+          showToast('Customer folio & dated photo log updated.', 'gold');
+        }
+      } else {
+        const priorOrder = atelier.orders.find(
+          (o) =>
+            o.customerName.toLowerCase() === customerName.toLowerCase() ||
+            (phone && o.phone.replace(/\s+/g, '') === phone.replace(/\s+/g, ''))
+        );
+
+        const priorSnapshot = priorOrder
+          ? [
+              {
+                id: 'hist-' + Date.now(),
+                garmentType: priorOrder.garmentType,
+                date: priorOrder.deliveryDate,
+                stage: priorOrder.stage,
+                summary: Object.entries(priorOrder.measurements || {})
+                  .slice(0, 4)
+                  .map(([k, v]) => `${k}: ${v}"`)
+                  .join(' · ')
+              },
+              ...(priorOrder.orderHistory || [])
+            ]
+          : [];
+
+        const newOrder = {
+          id: 'ord-' + Date.now(),
+          customerName,
+          phone,
+          gender,
+          garmentType,
+          deliveryDate,
+          stage,
+          designName,
+          fabricPhoto,
+          designPhoto,
+          photoEntries: [...modalStagedPhotoEntries],
+          notes,
+          stylePreferences,
+          measurements,
+          previousMeasurements: priorOrder ? { ...priorOrder.measurements } : { ...measurements },
+          orderHistory: priorSnapshot,
+          checklist: { qc1: false, qc2: false, qc3: false, qc4: false, qc5: false, qc6: false },
+          fittings: [],
+          reminderSent: false,
+          reminderLog: ''
+        };
+        atelier.orders.unshift(newOrder);
+        showToast(
+          priorOrder ? 'New order added with prior-measurement comparison!' : 'New customer order logged.',
+          'gold'
+        );
+      }
+
+      saveAtelierState();
+      closeCustomerModal();
+      renderAllViews();
+    }
+
+    function promptDeleteCustomer(orderId) {
+      const order = atelier.orders.find((o) => o.id === orderId);
+      if (!order) return;
+      openConfirmDialog(
+        'Delete Customer Folio?',
+        `Remove ${order.customerName} (${order.garmentType}) and all associated measurements and dated photos permanently from Stitch Log?`,
+        () => {
+          atelier.orders = atelier.orders.filter((o) => o.id !== orderId);
+          saveAtelierState();
+          renderAllViews();
+          showToast('Customer folio permanently deleted.');
+        }
+      );
+    }
+
+    // =========================================================
+    // DETAIL MODAL: DATED PHOTO LOG, COMPARISON, CHECKLIST & FITTINGS
+    // =========================================================
+    function openCustomerDetailModal(orderId) {
+      const order = atelier.orders.find((o) => o.id === orderId);
+      if (!order) return;
+
+      const fields = order.gender === 'Women' ? WOMEN_MEASUREMENTS : MEN_MEASUREMENTS;
+      const prev = order.previousMeasurements || {};
+      const curr = order.measurements || {};
+
+      const measComparisonHtml = fields
+        .map((f) => {
+          const cVal = curr[f.key];
+          const pVal = prev[f.key];
+          let diffBadge = `<span class="text-[11px] font-mono text-taupe">Baseline</span>`;
+          if (cVal !== undefined && pVal !== undefined) {
+            const diff = Number((cVal - pVal).toFixed(2));
+            if (diff > 0) {
+              diffBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-roseBlush text-roseDeep border border-roseDust">+${diff}"</span>`;
+            } else if (diff < 0) {
+              diffBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-parchment text-forest border border-gold/50">${diff}"</span>`;
+            } else {
+              diffBadge = `<span class="text-[11px] font-mono text-taupe">Same</span>`;
+            }
+          }
+          return `
+            <div class="bg-ivory rounded-xl p-2.5 border border-gold/30 flex items-center justify-between gap-2">
+              <div>
+                <p class="text-[11px] text-taupe">${f.label}</p>
+                <p class="text-sm font-mono font-bold text-forest">${cVal !== undefined ? cVal + '"' : '-'} <span class="text-[11px] text-taupe font-normal">(Prev: ${pVal !== undefined ? pVal + '"' : '-'})</span></p>
+              </div>
+              ${diffBadge}
+            </div>
+          `;
+        })
+        .join('');
+
+      const checklistHtml = QUALITY_CHECKLIST_TEMPLATE.map((item) => {
+        const checked = Boolean(order.checklist?.[item.id]);
+        return `
+          <label class="flex items-start gap-2.5 p-2 rounded-xl bg-ivory/80 border border-gold/25 cursor-pointer text-xs">
+            <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleQualityCheck('${order.id}', '${item.id}')" class="mt-0.5 accent-[#182C25] w-4 h-4 rounded" />
+            <span class="${checked ? 'line-through text-taupe' : 'text-espresso font-medium'}">${item.label}</span>
+          </label>
+        `;
+      }).join('');
+
+      const fittingsHtml =
+        (order.fittings || []).length === 0
+          ? `<p class="text-xs text-taupe italic">No fitting trials recorded yet.</p>`
+          : (order.fittings || [])
+              .map(
+                (fit) => `
+                  <div class="bg-ivory rounded-xl p-3 border border-gold/30 text-xs flex items-start justify-between gap-2">
+                    <div>
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-bold text-forest">${escapeHTML(fit.round)}</span>
+                        <span class="font-mono text-[11px] text-taupe">${escapeHTML(fit.date)}</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-roseBlush text-forest border border-roseDust">${escapeHTML(fit.status)}</span>
+                      </div>
+                      <p class="text-espresso mt-1">${escapeHTML(fit.notes)}</p>
+                    </div>
+                  </div>
+                `
+              )
+              .join('');
+
+      const photoEntries = normalizeOrderPhotoEntries(order);
+      const photoEntriesHtml =
+        photoEntries.length === 0
+          ? `<p class="text-xs text-taupe italic">No fabric or reference photos logged for this customer yet.</p>`
+          : photoEntries
+              .map((entry) => {
+                const fabImgs = (entry.fabricPhotos || [])
+                  .map(
+                    (src) => `
+                      <div class="space-y-1">
+                        <span class="block text-[10px] uppercase tracking-wider font-bold text-taupe">Fabric Given</span>
+                        <img src="${src}" alt="Fabric Swatch" class="w-full h-36 object-cover rounded-xl border border-gold/35" />
+                      </div>
+                    `
+                  )
+                  .join('');
+                const desImgs = (entry.designPhotos || [])
+                  .map(
+                    (src) => `
+                      <div class="space-y-1">
+                        <span class="block text-[10px] uppercase tracking-wider font-bold text-roseDeep">Reference Design</span>
+                        <img src="${src}" alt="Reference Design" class="w-full h-36 object-cover rounded-xl border border-roseDust/50" />
+                      </div>
+                    `
+                  )
+                  .join('');
+
+                return `
+                  <div class="bg-ivory/90 rounded-2xl p-4 border border-gold/40 space-y-3">
+                    <div class="flex items-center justify-between gap-2 flex-wrap border-b border-gold/25 pb-2">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-3 py-0.5 rounded-full text-xs font-mono font-bold bg-forest text-ivory border border-gold">
+                          Date Given: ${escapeHTML(entry.dateGiven || order.deliveryDate)}
+                        </span>
+                        <span class="text-xs font-bold text-forest">${escapeHTML(entry.note || 'Fabric & Reference Handover')}</span>
+                      </div>
+                      <button onclick="deletePhotoEntryFromOrder('${order.id}', '${entry.id}')" title="Delete this date entry" class="text-[11px] px-2.5 py-1 rounded-full bg-white hover:bg-roseBlush text-taupe hover:text-roseDeep border border-gold/40 flex items-center gap-1 no-print">
+                        <i class="ph-bold ph-trash"></i>
+                        <span>Delete Entry</span>
+                      </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                      ${fabImgs}
+                      ${desImgs}
+                    </div>
+                  </div>
+                `;
+              })
+              .join('');
+
+      document.getElementById('detail-modal-card').innerHTML = `
+        <div class="bg-forest text-ivory px-6 py-4 flex items-center justify-between border-b border-gold/50">
+          <div>
+            <h3 class="font-editorial text-2xl sm:text-3xl font-bold">${escapeHTML(order.customerName)} — ${escapeHTML(order.garmentType)}</h3>
+            <p class="text-xs text-roseDust font-mono">${escapeHTML(order.phone)} · Delivery: ${escapeHTML(order.deliveryDate)} · Stage: ${escapeHTML(order.stage)}</p>
+          </div>
+          <button onclick="closeDetailModal()" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-ivory">
+            <i class="ph-bold ph-x text-lg"></i>
+          </button>
+        </div>
+
+        <div class="p-6 space-y-6 max-h-[82vh] overflow-y-auto">
+          <!-- Date-Stamped Fabric & Reference Photos + Add Another Date Set -->
+          <div class="bg-white rounded-2xl p-4 sm:p-5 border-heirloom space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h4 class="font-editorial text-xl font-bold text-forest flex items-center gap-2">
+                <i class="ph-fill ph-calendar-check text-roseDeep"></i>
+                <span>Fabric &amp; Reference Image Log (By Date Given)</span>
+              </h4>
+              <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-roseBlush text-forest border border-roseDust font-bold">
+                ${photoEntries.length} ${photoEntries.length === 1 ? 'Visit Recorded' : 'Visits Recorded'}
+              </span>
+            </div>
+
+            <form onsubmit="addNewDatedPhotosToOrder(event, '${order.id}')" class="bg-roseTint/80 rounded-2xl p-3.5 border-rose-hairline space-y-3 no-print">
+              <p class="text-xs font-bold text-forest flex items-center gap-1.5">
+                <i class="ph-fill ph-plus-circle text-roseDeep"></i>
+                <span>Add New Fabric &amp; Reference Photos for Another Date (Same Customer ID)</span>
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div>
+                  <label class="block text-[10px] uppercase tracking-wider font-bold text-taupe mb-1">Date Given *</label>
+                  <input id="detail-new-photo-date" type="date" required value="${todayISO()}" class="w-full bg-white border border-gold/45 rounded-xl px-3 py-1.5 text-xs font-mono text-espresso" />
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-[10px] uppercase tracking-wider font-bold text-taupe mb-1">Visit / Batch Label</label>
+                  <input id="detail-new-photo-note" type="text" placeholder="e.g., Week 2 Visit — Silk Fabric & Neck Reference" class="w-full bg-white border border-gold/45 rounded-xl px-3 py-1.5 text-xs text-espresso" />
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label class="block text-[10px] uppercase tracking-wider font-bold text-taupe mb-1">Upload Fabric Image(s)</label>
+                  <input id="detail-new-fabric-files" type="file" accept="image/*" multiple class="block w-full text-xs text-taupe file:mr-2 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[11px] file:font-bold file:bg-roseBlush file:text-forest" />
+                </div>
+                <div>
+                  <label class="block text-[10px] uppercase tracking-wider font-bold text-taupe mb-1">Upload Reference Image(s)</label>
+                  <input id="detail-new-design-files" type="file" accept="image/*" multiple class="block w-full text-xs text-taupe file:mr-2 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[11px] file:font-bold file:bg-roseBlush file:text-forest" />
+                </div>
+              </div>
+              <div class="flex justify-end">
+                <button type="submit" class="btn-tactile px-4 py-1.5 rounded-full bg-forest text-ivory text-xs font-bold border border-gold flex items-center gap-1.5">
+                  <i class="ph-fill ph-floppy-disk text-roseDust"></i>
+                  <span>Save Dated Photos to Folio</span>
+                </button>
+              </div>
+            </form>
+
+            <div class="space-y-3">
+              ${photoEntriesHtml}
+            </div>
+          </div>
+
+          <!-- Style Preferences & Tailoring Notes -->
+          <div class="bg-roseTint/80 rounded-2xl p-4 border-rose-hairline grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div><span class="text-taupe block uppercase text-[10px] font-bold">Fit Preference</span><strong class="text-forest">${escapeHTML(order.stylePreferences?.fit || 'Classic')}</strong></div>
+            <div><span class="text-taupe block uppercase text-[10px] font-bold">Neck / Collar / Cuff</span><strong class="text-forest">${escapeHTML(order.stylePreferences?.neckOrCollar || 'Standard')}</strong></div>
+            <div><span class="text-taupe block uppercase text-[10px] font-bold">Lining &amp; Comfort</span><strong class="text-forest">${escapeHTML(order.stylePreferences?.comfortNotes || 'Standard lining')}</strong></div>
+            <div class="sm:col-span-3 pt-2 border-t border-roseDust/40 text-espresso">
+              <span class="text-taupe font-semibold">Tailoring Notes:</span> ${escapeHTML(order.notes || 'None')}
+            </div>
+          </div>
+
+          <!-- Customer Order & Measurement History Timeline -->
+          <div class="bg-white rounded-2xl p-4 sm:p-5 border-heirloom space-y-2.5">
+            <h4 class="font-editorial text-xl font-bold text-forest flex items-center gap-2">
+              <i class="ph-fill ph-clock-counter-clockwise text-roseDeep"></i>
+              <span>Customer Order &amp; Saved Measurement History</span>
+            </h4>
+            <div id="detail-customer-history" class="space-y-2">
+              ${renderCustomerHistoryList(order)}
+            </div>
+          </div>
+
+          <!-- Smart Measurement Comparison with Previous Order -->
+          <div class="bg-white rounded-2xl p-4 sm:p-5 border-heirloom space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <h4 class="font-editorial text-xl font-bold text-forest flex items-center gap-2">
+                <i class="ph-bold ph-arrows-left-right text-roseDeep"></i>
+                <span>Smart Measurement Comparison vs. Previous Order</span>
+              </h4>
+              <span class="text-[11px] text-taupe">Differences highlighted in inches</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+              ${measComparisonHtml}
+            </div>
+          </div>
+
+          <!-- Stitching Quality Checklist & Fitting History Side-by-Side -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="bg-white rounded-2xl p-4 border-heirloom space-y-3">
+              <h4 class="font-editorial text-xl font-bold text-forest flex items-center gap-2">
+                <i class="ph-fill ph-check-square-offset text-gold"></i>
+                <span>Stitching Quality Checklist</span>
+              </h4>
+              <div class="space-y-2">
+                ${checklistHtml}
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-4 border-heirloom space-y-3">
+              <h4 class="font-editorial text-xl font-bold text-forest flex items-center gap-2">
+                <i class="ph-fill ph-coat-hanger text-roseDeep"></i>
+                <span>Fitting Rounds &amp; History</span>
+              </h4>
+              <form onsubmit="addFittingRound(event, '${order.id}')" class="space-y-2 bg-ivory p-3 rounded-xl border border-gold/30 no-print">
+                <div class="grid grid-cols-2 gap-2">
+                  <input id="fit-round-input" type="text" required placeholder="e.g., Fitting #2 Trial" class="bg-white border border-gold/40 rounded-lg px-2.5 py-1.5 text-xs" />
+                  <select id="fit-status-input" class="bg-white border border-gold/40 rounded-lg px-2.5 py-1.5 text-xs">
+                    <option value="Approved Fit">Approved Fit</option>
+                    <option value="Alteration Logged">Alteration Logged</option>
+                    <option value="Ready for Handover">Ready for Handover</option>
+                  </select>
+                </div>
+                <div class="flex gap-2">
+                  <input id="fit-notes-input" type="text" required placeholder="Trial notes, pin adjustments..." class="flex-1 bg-white border border-gold/40 rounded-lg px-2.5 py-1.5 text-xs" />
+                  <button type="submit" class="px-3.5 py-1.5 rounded-lg bg-forest text-ivory text-xs font-bold">Log Fit</button>
+                </div>
+              </form>
+              <div class="space-y-2 max-h-48 overflow-y-auto">
+                ${fittingsHtml}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3 pt-2 border-t border-gold/30 no-print">
+            <button onclick="openPrintableSlip('${order.id}')" class="px-4 py-2 rounded-full bg-roseBlush hover:bg-roseDust/60 text-forest border border-roseDust text-xs font-bold flex items-center gap-1.5">
+              <i class="ph-fill ph-receipt text-roseDeep"></i>
+              <span>Measurement &amp; Order Slip</span>
+            </button>
+            <button onclick="window.print()" class="px-4 py-2 rounded-full bg-parchment text-forest border border-gold/45 text-xs font-bold flex items-center gap-1.5">
+              <i class="ph-bold ph-printer"></i>
+              <span>Print Folio</span>
+            </button>
+            <button onclick="closeDetailModal()" class="px-5 py-2 rounded-full bg-forest text-ivory text-xs font-bold border border-gold">Done</button>
+          </div>
+        </div>
+      `;
+
+      const modal = document.getElementById('detail-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    async function addNewDatedPhotosToOrder(e, orderId) {
+      e.preventDefault();
+      const order = atelier.orders.find((o) => o.id === orderId);
+      if (!order) return;
+
+      const dateGiven = document.getElementById('detail-new-photo-date').value || todayISO();
+      const note = document.getElementById('detail-new-photo-note').value.trim();
+      const fabFiles = Array.from(document.getElementById('detail-new-fabric-files')?.files || []);
+      const desFiles = Array.from(document.getElementById('detail-new-design-files')?.files || []);
+
+      if (fabFiles.length === 0 && desFiles.length === 0) {
+        showToast('Please choose at least one fabric or reference image.');
+        return;
+      }
+
+      const readAll = async (fileList) => {
+        const out = [];
+        for (const f of fileList) {
+          const raw = await new Promise((res) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => res(ev.target.result);
+            reader.readAsDataURL(f);
+          });
+          out.push(await compressImageDataUrl(raw));
+        }
+        return out;
+      };
+
+      const fabricPhotos = await readAll(fabFiles);
+      const designPhotos = await readAll(desFiles);
+
+      order.photoEntries = normalizeOrderPhotoEntries(order);
+      order.photoEntries.unshift({
+        id: 'pe-' + Date.now(),
+        dateGiven,
+        note: note || `Handover on ${dateGiven}`,
+        fabricPhotos,
+        designPhotos
+      });
+
+      if (fabricPhotos[0]) order.fabricPhoto = fabricPhotos[0];
+      if (designPhotos[0]) order.designPhoto = designPhotos[0];
+
+      saveAtelierState();
+      renderCustomerOrders();
+      openCustomerDetailModal(orderId);
+      showToast(`Saved fabrics & references for ${dateGiven}!`, 'gold');
+    }
+
+    function deletePhotoEntryFromOrder(orderId, entryId) {
+      const order = atelier.orders.find((o) => o.id === orderId);
+      if (!order) return;
+      openConfirmDialog(
+        'Delete Dated Photo Entry?',
+        'Permanently remove this date’s fabric and reference images from this customer folio?',
+        () => {
+          order.photoEntries = normalizeOrderPhotoEntries(order).filter((pe) => pe.id !== entryId);
+          saveAtelierState();
+          renderCustomerOrders();
+          openCustomerDetailModal(orderId);
+          showToast('Dated photo entry deleted.');
+        }
+      );
+    }
+
+    function closeDetailModal() {
+      const modal = document.getElementById('detail-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function toggleQualityCheck(orderId, checkId) {
+      const order = atelier.orders.find((o) => o.id === orderId);
+      if (!order) return;
+      order.checklist = order.checklist || {};
+      order.checklist[checkId] = !order.checklist[checkId];
+      saveAtelierState();
+      renderCustomerOrders();
+      openCustomerDetailModal(orderId);
+      showToast('Quality checklist updated.');
+    }
+
+    function addFittingRound(e, orderId) {
+      e.preventDefault();
+      const order = atelier.orders.find((o) => o.id === orderId);
+      if (!order) return;
+      const round = document.getElementById('fit-round-input').value.trim();
+      const status = document.getElementById('fit-status-input').value;
+      const notes = document.getElementById('fit-notes-input').value.trim();
+      const todayStr = todayISO();
+
+      order.fittings = order.fittings || [];
+      order.fittings.unshift({
+        id: 'fit-' + Date.now(),
+        round,
+        date: todayStr,
+        status,
+        notes
+      });
+      saveAtelierState();
+      openCustomerDetailModal(orderId);
+      showToast('Fitting round logged.', 'gold');
+    }
+
+    function renderCustomerHistoryList(currentOrder) {
+      const otherOrders = atelier.orders.filter(
+        (o) =>
+          o.id !== currentOrder.id &&
+          (o.customerName.toLowerCase() === currentOrder.customerName.toLowerCase() ||
+            (currentOrder.phone && o.phone.replace(/\s+/g, '') === currentOrder.phone.replace(/\s+/g, '')))
+      );
+
+      const combined = [
+        ...(currentOrder.orderHistory || []),
+        ...otherOrders.map((h) => ({
+          id: h.id,
+          garmentType: h.garmentType,
+          date: h.deliveryDate,
+          stage: h.stage,
+          summary: Object.entries(h.measurements || {})
+            .slice(0, 4)
+            .map(([k, v]) => `${k}: ${v}"`)
+            .join(' · ')
+        }))
+      ];
+
+      if (combined.length === 0) {
+        return `<p class="text-xs text-taupe italic">No earlier historical orders recorded for ${escapeHTML(currentOrder.customerName)} yet.</p>`;
+      }
+
+      return combined
+        .map(
+          (h) => `
+            <div class="bg-ivory rounded-xl p-3 border border-gold/25 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <div>
+                <p class="font-bold text-forest">${escapeHTML(h.garmentType)}</p>
+                <p class="font-mono text-[11px] text-espresso mt-0.5">${escapeHTML(h.summary || 'Saved measurement record')}</p>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-parchment text-forest border border-gold/30">${escapeHTML(h.stage)}</span>
+                <span class="font-mono text-[11px] text-taupe">${escapeHTML(h.date)}</span>
+              </div>
+            </div>
+          `
+        )
+        .join('');
+    }
+
+    function openInchCmHelperModal() {
+      openConfirmDialog(
+        'Inches ↔ Centimeters Reference',
+        '1 inch = 2.54 cm | 0.25" = 0.64 cm | 0.5" = 1.27 cm | 0.75" = 1.91 cm | 36" = 91.44 cm | 44" = 111.76 cm. All Stitch Log measurements are stored in inches (").',
+        () => {}
+      );
+    }
+
+    function openPrintableSlip(orderId) {
+      const order = atelier.orders.find((o) => o.id === orderId);
+      if (!order) return;
+      const fields = order.gender === 'Women' ? WOMEN_MEASUREMENTS : MEN_MEASUREMENTS;
+      const summary = fields
+        .filter((f) => order.measurements?.[f.key] !== undefined)
+        .map((f) => `${f.label}: ${order.measurements[f.key]}"`)
+        .join(' | ');
+
+      openConfirmDialog(
+        `Order Slip — ${order.customerName}`,
+        `${order.garmentType} (${order.gender}) · Due: ${order.deliveryDate} · Stage: ${order.stage} | ${summary || 'No measurements entered'}. Click Confirm to print this slip.`,
+        () => window.print()
+      );
+    }
+
+    // =========================================================
+    // TAB 2: DELIVERY DASHBOARD & REMINDERS
+    // =========================================================
+    function renderDeliveriesView() {
+      const overdue = atelier.orders.filter(isOrderOverdue);
+      const upcoming = atelier.orders.filter((o) => !isOrderOverdue(o));
+
+      document.getElementById('deliv-overdue-count').textContent = overdue.length;
+      document.getElementById('deliv-upcoming-count').textContent = upcoming.length;
+
+      document.getElementById('overdue-orders-list').innerHTML =
+        overdue.length === 0
+          ? `<div class="bg-white/95 rounded-2xl p-6 border-heirloom text-xs text-taupe italic col-span-2">${escapeHTML(t('noOverdueMsg'))}</div>`
+          : overdue.map((o) => renderDeliveryCard(o, true)).join('');
+
+      document.getElementById('upcoming-orders-list').innerHTML =
+        upcoming.length === 0
+          ? `<div class="bg-white/95 rounded-2xl p-6 border-heirloom text-xs text-taupe italic col-span-2">${escapeHTML(t('noUpcomingMsg'))}</div>`
+          : upcoming.map((o) => renderDeliveryCard(o, false)).join('');
+    }
+
+    function renderDeliveryCard(order, isOverdue) {
+      return `
+        <div class="bg-white/95 rounded-2xl p-4 sm:p-5 border ${isOverdue ? 'border-roseDeep bg-roseTint/45' : 'border-gold/50'} shadow-card flex flex-col justify-between gap-3">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-editorial text-xl font-bold text-forest">${escapeHTML(order.customerName)}</h4>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${isOverdue ? 'bg-roseDeep text-ivory' : 'bg-roseBlush text-forest border border-roseDust'}">
+                  ${isOverdue ? escapeHTML(t('overdueBadge')).toUpperCase() : escapeHTML(translateStageLabel(order.stage))}
+                </span>
+              </div>
+              <p class="text-xs text-taupe mt-0.5">${escapeHTML(order.garmentType)} · <span class="font-mono">${escapeHTML(order.phone)}</span></p>
+            </div>
+            <span class="text-xs font-mono font-bold ${isOverdue ? 'text-roseDeep' : 'text-forest'}">${escapeHTML(t('duePrefix'))} ${escapeHTML(order.deliveryDate)}</span>
+          </div>
+
+          <div class="flex items-center justify-between gap-2 pt-2 border-t border-gold/25 text-xs">
+            <span class="text-taupe">
+              ${order.reminderSent ? `<i class="ph-fill ph-check-circle text-forest"></i> ${escapeHTML(order.reminderLog || t('remindedBadge'))}` : escapeHTML(t('reminderNone'))}
+            </span>
+            <div class="flex items-center gap-2">
+              <button onclick="sendDeliveryReminder('${order.id}')" class="btn-tactile px-3 py-1.5 rounded-full bg-roseBlush hover:bg-roseDust/60 text-forest border border-roseDust font-bold flex items-center gap-1">
+                <i class="ph-fill ph-bell-ringing text-roseDeep"></i>
+                <span>${escapeHTML(order.reminderSent ? t('reRemind') : t('sendReminder'))}</span>
+              </button>
+              <button onclick="advanceOrderStage('${order.id}')" class="btn-tactile px-3 py-1.5 rounded-full bg-forest text-ivory font-bold border border-gold">
+                ${escapeHTML(t('nextStage'))}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function sendDeliveryReminder(orderId) {
+      const order = atelier.orders.find((o) => o.id === orderId);
+      if (!order) return;
+      const todayStr = todayISO();
+      order.reminderSent = true;
+      order.reminderLog = `Sent on ${todayStr}`;
+      saveAtelierState();
+      renderAllViews();
+      showToast(`Delivery reminder logged for ${order.customerName} (${order.phone}).`, 'gold');
+    }
+
+    // =========================================================
+    // TAB 3: SHOP SETTINGS, RESTORE & PERMANENT ACCOUNT DELETION
+    // =========================================================
+    function saveBoutiqueSettings(e) {
+      e.preventDefault();
+      const bName = document.getElementById('set-boutique-name').value.trim();
+      const tName = document.getElementById('set-tailor-name').value.trim();
+      const lang = document.getElementById('set-language').value;
+
+      atelier.account.boutiqueName = bName;
+      atelier.account.tailorName = tName;
+      atelier.language = lang;
+      saveAtelierState();
+      syncHeaderIdentity();
+      applyTranslations();
+      showToast('Stitch Log shop profile saved.', 'gold');
+    }
+
+    function promptRestoreSampleAtelier() {
+      openConfirmDialog(
+        'Restore Sample Atelier Data?',
+        'This reloads sample customer folios, prior measurement comparisons, dated fabric/design logs, and delivery records.',
+        () => {
+          const fresh = getDefaultAtelierState();
+          fresh.isAuthenticated = true;
+          fresh.account = { ...atelier.account };
+          fresh.language = atelier.language;
+          fresh.logoData = atelier.logoData || '';
+          atelier = fresh;
+          saveAtelierState();
+          renderAllViews();
+          showToast('Sample atelier records restored.', 'gold');
+        }
+      );
+    }
+
+    function promptDeleteTailorAccount() {
+      openConfirmDialog(
+        'Delete Tailor Account & Settings?',
+        'This permanently deletes your tailor account ID, credentials, shop settings, and all stored customer records from this browser. You will not be logged back in automatically.',
+        () => {
+          localStorage.removeItem(ATELIER_KEY);
+          atelier = {
+            isAuthenticated: false,
+            language: 'en',
+            account: null,
+            genderLedger: 'All',
+            orders: []
+          };
+          saveAtelierState();
+          document.getElementById('login-identifier').value = '';
+          document.getElementById('login-password').value = '';
+          document.getElementById('app-shell').classList.add('hidden');
+          document.getElementById('auth-screen').classList.remove('hidden');
+          setAuthMode('signup');
+          showToast('Tailor account and all data permanently deleted.');
+        }
+      );
+    }
+
+    // =========================================================
+    // CONFIRMATION DIALOG & ESCAPE HTML
+    // =========================================================
+    function openConfirmDialog(title, message, onConfirm) {
+      document.getElementById('confirm-title').textContent = title;
+      document.getElementById('confirm-message').textContent = message;
+      pendingConfirmFn = onConfirm;
+      const modal = document.getElementById('confirm-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeConfirmModal() {
+      const modal = document.getElementById('confirm-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      pendingConfirmFn = null;
+    }
+
+    document.getElementById('confirm-proceed-btn').addEventListener('click', () => {
+      if (typeof pendingConfirmFn === 'function') pendingConfirmFn();
+      closeConfirmModal();
+    });
+
+    function escapeHTML(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Boot Application
+    window.addEventListener('DOMContentLoaded', () => {
+      populateLanguageSelects();
+      applyTranslations();
+      if (atelier.isAuthenticated && atelier.account?.email) {
+        enterAtelierShell();
+      } else {
+        document.getElementById('auth-screen').classList.remove('hidden');
+        document.getElementById('app-shell').classList.add('hidden');
+        if (!atelier.account || !atelier.account.email) {
+          document.getElementById('login-identifier').value = '';
+          document.getElementById('login-password').value = '';
+          setAuthMode('signup');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
